@@ -5,6 +5,7 @@
 @using Blazor.Helpers
 @inject INotesApiClient NotesApiClient
 @inject IHealthApiClient HealthApiClient
+@inject IDocumentationApiClient DocumentationApiClient
 
 <!-- HERO SECTION -->
 <section class="hero-section">
@@ -114,10 +115,10 @@
 <!-- MILESTONE SECTIONS -->
 <section class="milestones-container">
     <div class="accordion" id="milestonesAccordion">
-        @foreach (DocumentationCategory cat in Enum.GetValues(typeof(DocumentationCategory)))
+        @foreach (var milestone in milestones)
         {
-            var categoryName = EnumDisplayHelper.GetDisplayName(cat);
-            var categoryKey = cat.ToString();
+            var categoryName = milestone.CategoryDisplayName;
+			var categoryKey = milestone.Category.ToString();
             var categoryNotes = notes.Where(n => n.Category == categoryName).ToList();
 
             <div class="accordion-item milestone-card">
@@ -135,34 +136,34 @@
                     <div class="accordion-body milestone-body">
                         <div class="milestone-field">
                             <h4>What I Did</h4>
-                            <p class="placeholder-text">Placeholder: Describe what you accomplished in this milestone.</p>
+                            <p class="placeholder-text">@GetTextOrPlaceholder(milestone.WhatIDid, "Placeholder: Describe what you accomplished in this milestone.")</p>
                         </div>
 
                         <div class="milestone-field">
                             <h4>Commands Used</h4>
-                            <pre class="code-block placeholder-text">Placeholder: Add terminal commands here</pre>
+                            <pre class="code-block placeholder-text">@GetTextOrPlaceholder(milestone.CommandsUsed, "Placeholder: Add terminal commands here")</pre>
                         </div>
 
                         <div class="milestone-field">
                             <h4>Screenshot</h4>
                             <div class="screenshot-placeholder">
-                                <p>Placeholder: Add screenshot here</p>
+                                <p>@GetTextOrPlaceholder(milestone.ScreenshotNotes, "Placeholder: Add screenshot notes here")</p>
                             </div>
                         </div>
 
                         <div class="milestone-field">
                             <h4>Problems I Faced</h4>
-                            <p class="placeholder-text">Placeholder: Document any issues you encountered.</p>
+                            <p class="placeholder-text">@GetTextOrPlaceholder(milestone.ProblemsFaced, "Placeholder: Document any issues you encountered.")</p>
                         </div>
 
                         <div class="milestone-field">
                             <h4>What I Learned</h4>
-                            <p class="placeholder-text">Placeholder: Reflect on key learnings.</p>
+                            <p class="placeholder-text">@GetTextOrPlaceholder(milestone.WhatILearned, "Placeholder: Reflect on key learnings.")</p>
                         </div>
 
                         <div class="milestone-field">
                             <h4>Production Connection</h4>
-                            <p class="placeholder-text">Placeholder: Explain how this applies to production.</p>
+                            <p class="placeholder-text">@GetTextOrPlaceholder(milestone.ProductionConnection, "Placeholder: Explain how this applies to production.")</p>
                         </div>
 
                         @if (categoryNotes.Any())
@@ -247,6 +248,7 @@
 @code {
     private List<DeploymentNoteDto> notes = new();
     private CreateDeploymentNoteDto newNote = new();
+    private List<DocumentationMilestoneDto> milestones = new();
     private bool isLoading = true;
     private string? errorMessage;
     private HealthStatusDto? healthStatus;
@@ -262,6 +264,7 @@
     {
         await LoadHealthStatusAsync();
         await LoadNotesAsync();
+        await LoadMilestonesAsync();
     }
 
     private async Task LoadHealthStatusAsync()
@@ -300,6 +303,21 @@
         }
     }
 
+    private async Task LoadMilestonesAsync()
+    {
+        try
+        {
+            milestones = await DocumentationApiClient.GetMilestonesAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Could not load documentation milestones. Is the API running? Error: {ex.Message}";
+        }
+    }
+    private static string GetTextOrPlaceholder(string value, string placeholder)
+    {
+        return string.IsNullOrWhiteSpace(value) ? placeholder : value;
+    }
     private void OnCategoryChanged(ChangeEventArgs e)
     {
         selectedCategoryDisplay = e?.Value?.ToString() ?? string.Empty;
