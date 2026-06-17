@@ -45,15 +45,6 @@ using (var scope = app.Services.CreateScope())
 {
 	var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-	if (!dbContext.DeploymentNotes.Any())
-	{
-		dbContext.DeploymentNotes.AddRange(
-		// old note seed data
-		);
-
-		dbContext.SaveChanges();
-	}
-
 	foreach (DocumentationCategory category in Enum.GetValues(typeof(DocumentationCategory)))
 	{
 		var milestoneExists = dbContext.DocumentationMilestones
@@ -64,18 +55,33 @@ using (var scope = app.Services.CreateScope())
 			dbContext.DocumentationMilestones.Add(new DocumentationMilestone
 			{
 				Category = category,
-				WhatIDid = string.Empty,
-				CommandsUsed = string.Empty,
-				ScreenshotNotes = string.Empty,
-				ProblemsFaced = string.Empty,
-				WhatILearned = string.Empty,
-				ProductionConnection = string.Empty,
+				CategoryDisplayName = GetDefaultCategoryDisplayName(category),
+				DocumentationContent = string.Empty,
 				UpdatedAt = DateTime.UtcNow
 			});
 		}
 	}
 
 	dbContext.SaveChanges();
+}
+
+static string GetDefaultCategoryDisplayName(DocumentationCategory category)
+{
+	return category switch
+	{
+		DocumentationCategory.SshAndServerSecurity => "SSH & Server Security",
+		DocumentationCategory.DnsFirewallAndDomain => "DNS, Firewall & Domain",
+		DocumentationCategory.DatabaseSetup => "Database Setup",
+		DocumentationCategory.NginxHttpsAndReverseProxy => "Nginx, HTTPS & Reverse Proxy",
+		DocumentationCategory.DockerFundamentals => "Docker Fundamentals",
+		DocumentationCategory.DockerCompose => "Docker Compose",
+		DocumentationCategory.VolumesPersistenceAndNetworking => "Volumes, Persistence & Networking",
+		DocumentationCategory.DokployGithubAndCiCd => "Dokploy, GitHub & CI/CD",
+		DocumentationCategory.MonitoringAndLogging => "Monitoring & Logging",
+		DocumentationCategory.OwaspAndSecurityHeaders => "OWASP & Security Headers",
+		DocumentationCategory.ContainerSecurityAndSecrets => "Container Security & Secrets",
+		_ => category.ToString()
+	};
 }
 
 app.Run();

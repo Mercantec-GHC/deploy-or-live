@@ -16,8 +16,6 @@ builder.Services.AddScoped(sp => new HttpClient
 	BaseAddress = new Uri(apiBaseUrl)
 });
 
-
-builder.Services.AddScoped<INotesApiClient, NotesApiClient>();
 builder.Services.AddScoped<IHealthApiClient, HealthApiClient>();
 builder.Services.AddScoped<IDocumentationApiClient, DocumentationApiClient>();
 await builder.Build().RunAsync();

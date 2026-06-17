@@ -2,10 +2,6 @@
 
 public class UpdateDocumentationMilestoneDto
 {
-	public string WhatIDid { get; set; } = string.Empty;
-	public string CommandsUsed { get; set; } = string.Empty;
-	public string ScreenshotNotes { get; set; } = string.Empty;
-	public string ProblemsFaced { get; set; } = string.Empty;
-	public string WhatILearned { get; set; } = string.Empty;
-	public string ProductionConnection { get; set; } = string.Empty;
+	public string CategoryDisplayName { get; set; } = string.Empty;
+	public string DocumentationContent { get; set; } = string.Empty;
 }

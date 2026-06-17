@@ -10,8 +10,6 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<DeploymentNoteVm> DeploymentNotes => Set<DeploymentNoteVm>();
-
     public DbSet<DocumentationMilestone> DocumentationMilestones => Set<DocumentationMilestone>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

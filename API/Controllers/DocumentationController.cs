@@ -27,12 +27,7 @@ public class DocumentationController : ControllerBase
 				Id = milestone.Id,
 				Category = milestone.Category,
 				CategoryDisplayName = GetCategoryDisplayName(milestone.Category),
-				WhatIDid = milestone.WhatIDid,
-				CommandsUsed = milestone.CommandsUsed,
-				ScreenshotNotes = milestone.ScreenshotNotes,
-				ProblemsFaced = milestone.ProblemsFaced,
-				WhatILearned = milestone.WhatILearned,
-				ProductionConnection = milestone.ProductionConnection,
+				DocumentationContent = milestone.DocumentationContent,
 				UpdatedAt = milestone.UpdatedAt
 			})
 			.ToListAsync();
@@ -51,12 +46,7 @@ public class DocumentationController : ControllerBase
 				Id = milestone.Id,
 				Category = milestone.Category,
 				CategoryDisplayName = GetCategoryDisplayName(milestone.Category),
-				WhatIDid = milestone.WhatIDid,
-				CommandsUsed = milestone.CommandsUsed,
-				ScreenshotNotes = milestone.ScreenshotNotes,
-				ProblemsFaced = milestone.ProblemsFaced,
-				WhatILearned = milestone.WhatILearned,
-				ProductionConnection = milestone.ProductionConnection,
+				DocumentationContent = milestone.DocumentationContent,
 				UpdatedAt = milestone.UpdatedAt
 			})
 			.FirstOrDefaultAsync();
@@ -69,6 +59,39 @@ public class DocumentationController : ControllerBase
 		return Ok(milestone);
 	}
 
+	[HttpPut("{category}")]
+	public async Task<ActionResult<DocumentationMilestoneDto>> UpdateMilestone(
+	DocumentationCategory category,
+	UpdateDocumentationMilestoneDto updateDto)
+	{
+		// TODO: Protect this endpoint with authentication/authorization before production.
+		var milestone = await _dbContext.DocumentationMilestones
+			.FirstOrDefaultAsync(milestone => milestone.Category == category);
+
+		if (milestone is null)
+		{
+			return NotFound();
+		}
+
+		milestone.CategoryDisplayName = updateDto.CategoryDisplayName;
+		milestone.DocumentationContent = updateDto.DocumentationContent;
+		milestone.UpdatedAt = DateTime.UtcNow;
+
+		await _dbContext.SaveChangesAsync();
+
+		return Ok(MapToDto(milestone));
+	}
+	private static DocumentationMilestoneDto MapToDto(DocumentationMilestone milestone)
+	{
+		return new DocumentationMilestoneDto
+		{
+			Id = milestone.Id,
+			Category = milestone.Category,
+			CategoryDisplayName = milestone.CategoryDisplayName,
+			DocumentationContent = milestone.DocumentationContent,
+			UpdatedAt = milestone.UpdatedAt
+		};
+	}
 	private static string GetCategoryDisplayName(DocumentationCategory category)
 	{
 		return category switch
