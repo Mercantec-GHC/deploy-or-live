@@ -131,21 +131,66 @@
                     <p>@milestone.DocumentationContent</p>
                 }
             </div>
+            @if (isEditMode && editingMilestone?.Id == milestone.Id)
+            {
+                <div class="milestone-edit-form">
+                    <label>Section title</label>
+                    <input class="form-control"
+                           @bind="editModel.CategoryDisplayName" />
+
+                    <label>Documentation content</label>
+                    <textarea class="form-control documentation-editor"
+                              @bind="editModel.DocumentationContent"></textarea>
+
+                    <div class="edit-actions">
+                        <button class="btn btn-primary" @onclick="SaveMilestoneAsync">
+                            Save
+                        </button>
+
+                        <button class="btn btn-secondary" @onclick="CancelEditingMilestone">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h2>@milestone.CategoryDisplayName</h2>
+
+                <div class="milestone-content">
+                    @if (string.IsNullOrWhiteSpace(milestone.DocumentationContent))
+                    {
+                        <p class="placeholder-text">
+                            Placeholder: Add documentation content for this milestone.
+                        </p>
+                    }
+                    else
+                    {
+                        <p>@milestone.DocumentationContent</p>
+                    }
+                </div>
+
+                @if (isEditMode)
+                {
+                    <button class="btn btn-outline-primary"
+                            @onclick="() => StartEditingMilestone(milestone)">
+                        Edit section
+                    </button>
+                }
+            }
         }
     </div>
 </section>
 
-<!-- ADD NOTE FORM (COLLAPSIBLE, ONLY IN EDIT MODE) -->
-@if (isEditMode)
-{
-    //ToDo
-}
+
 
 @code {
     private List<DocumentationMilestoneDto> milestones = new();
     private bool isLoading = true;
     private string? errorMessage;
     private HealthStatusDto? healthStatus;
+    private DocumentationMilestoneDto? editingMilestone;
+    private UpdateDocumentationMilestoneDto editModel = new();
 
     private bool isEditMode = false;
     private bool showEditForm = false;
@@ -186,10 +231,50 @@
             errorMessage = $"Could not load documentation milestones. Is the API running? Error: {ex.Message}";
         }
     }
-    private static string GetTextOrPlaceholder(string value, string placeholder)
+    private void StartEditingMilestone(DocumentationMilestoneDto milestone)
     {
-        return string.IsNullOrWhiteSpace(value) ? placeholder : value;
-    }     
+        editingMilestone = milestone;
+
+        editModel = new UpdateDocumentationMilestoneDto
+        {
+            CategoryDisplayName = milestone.CategoryDisplayName,
+            DocumentationContent = milestone.DocumentationContent
+        };
+    }
+
+    private void CancelEditingMilestone()
+    {
+        editingMilestone = null;
+        editModel = new UpdateDocumentationMilestoneDto();
+    }
+
+    private async Task SaveMilestoneAsync()
+    {
+        if (editingMilestone is null)
+        {
+            return;
+        }
+
+        var updatedMilestone = await DocumentationApiClient.UpdateMilestoneAsync(
+            editingMilestone.Category,
+            editModel);
+
+        if (updatedMilestone is null)
+        {
+            errorMessage = "Could not update documentation milestone.";
+            return;
+        }
+
+        var index = milestones.FindIndex(milestone => milestone.Id == updatedMilestone.Id);
+
+        if (index >= 0)
+        {
+            milestones[index] = updatedMilestone;
+        }
+
+        editingMilestone = null;
+        editModel = new UpdateDocumentationMilestoneDto();
+    }
 
     private void ToggleEditForm()
     {

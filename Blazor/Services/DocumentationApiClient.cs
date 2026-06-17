@@ -25,4 +25,17 @@ public class DocumentationApiClient : IDocumentationApiClient
 	{
 		return await _httpClient.GetFromJsonAsync<DocumentationMilestoneDto>($"api/documentation/{category}");
 	}
+	public async Task<DocumentationMilestoneDto?> UpdateMilestoneAsync(
+	DocumentationCategory category,
+	UpdateDocumentationMilestoneDto updateDto)
+	{
+		var response = await _httpClient.PutAsJsonAsync($"api/documentation/{category}", updateDto);
+
+		if (!response.IsSuccessStatusCode)
+		{
+			return null;
+		}
+
+		return await response.Content.ReadFromJsonAsync<DocumentationMilestoneDto>();
+	}
 }
