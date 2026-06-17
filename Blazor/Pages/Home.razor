@@ -1,7 +1,357 @@
-﻿@page "/"
+@page "/"
+@using DomainModels.Dto
+@using DomainModels.Models
+@using Blazor.Interfaces
+@using Blazor.Helpers
+@inject INotesApiClient NotesApiClient
+@inject IHealthApiClient HealthApiClient
 
-<PageTitle>Home</PageTitle>
+<!-- HERO SECTION -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Hi! I'm Victoria and this is my experience in how I used 3 weeks on learning about deployment</h1>
+        <p class="hero-subtitle">A full-stack deployment learning project with Blazor, ASP.NET Core, EF Core and SQL Server.</p>
+        <div class="hero-badges">
+            <span class="badge-tech">Blazor WASM</span>
+            <span class="badge-tech">ASP.NET Core API</span>
+            <span class="badge-tech">EF Core</span>
+            <span class="badge-tech">SQL Server</span>
+            <span class="badge-tech">Docker-ready</span>
+        </div>
+    </div>
+</section>
 
-<h1>Hello, world!</h1>
+<!-- PROJECT STATUS BAR -->
+<section class="status-bar">
+    <div class="status-container">
+        @if (healthStatus is null)
+        {
+            <div class="status-item">
+                <span class="status-label">Backend Status:</span>
+                <span class="status-value checking">Checking...</span>
+            </div>
+        }
+        else
+        {
+            var healthy = !string.IsNullOrWhiteSpace(healthStatus.Status) && healthStatus.Status.Contains("healthy", StringComparison.OrdinalIgnoreCase);
+            <div class="status-item">
+                <span class="status-label">Backend:</span>
+                <span class="status-value @(healthy ? "healthy" : "unreachable")">@healthStatus.Status</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Database:</span>
+                <span class="status-value @(healthy ? "healthy" : "unreachable")">@healthStatus.Database</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Environment:</span>
+                <span class="status-value">@healthStatus.Environment</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Checked:</span>
+                <span class="status-value">@healthStatus.Timestamp.ToLocalTime().ToString("g")</span>
+            </div>
+        }
 
-Welcome to your new app.
+        <div class="status-edit-mode">
+            <!-- Temporary UI-only edit mode. Real protection must be implemented in the API with authentication/authorization. -->
+            <label class="edit-mode-label">
+                <input type="checkbox" @bind="isEditMode" />
+                <span>Edit mode</span>
+            </label>
+        </div>
+    </div>
+</section>
+
+<!-- DOCUMENTATION INTRODUCTION -->
+<section class="doc-section intro-section">
+    <h2>About This Documentation</h2>
+    <p>
+        This page documents my journey of learning real-world deployment over 3 weeks. Each section below covers a key topic from the DevOps course, 
+        including what I did, commands I executed, problems I encountered, and what I learned. At the end, you'll find evidence of deployment and a final reflection.
+    </p>
+    <p class="requirement-note">
+        <strong>Documentation Target:</strong> At least 14,400 characters, including terminal commands, screenshots, reflections and deployment proof.
+    </p>
+</section>
+
+<!-- PROGRESS SECTION -->
+<section class="doc-section progress-section">
+    <h2>Documentation Progress</h2>
+    <div class="progress-items">
+        <div class="progress-item">
+            <div class="progress-label">Written Documentation</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-label">Commands</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-label">Screenshots</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-label">Reflections</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <div class="progress-item">
+            <div class="progress-label">Deployment Proof</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MILESTONE SECTIONS -->
+<section class="milestones-container">
+    <div class="accordion" id="milestonesAccordion">
+        @foreach (DocumentationCategory cat in Enum.GetValues(typeof(DocumentationCategory)))
+        {
+            var categoryName = EnumDisplayHelper.GetDisplayName(cat);
+            var categoryKey = cat.ToString();
+            var categoryNotes = notes.Where(n => n.Category == categoryName).ToList();
+
+            <div class="accordion-item milestone-card">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@categoryKey" aria-expanded="false" aria-controls="collapse_@categoryKey">
+                        <span class="milestone-icon">??</span>
+                        @categoryName
+                        @if (categoryNotes.Any())
+                        {
+                            <span class="milestone-note-count">@categoryNotes.Count note@(categoryNotes.Count != 1 ? "s" : "")</span>
+                        }
+                    </button>
+                </h2>
+                <div id="collapse_@categoryKey" class="accordion-collapse collapse" data-bs-parent="#milestonesAccordion">
+                    <div class="accordion-body milestone-body">
+                        <div class="milestone-field">
+                            <h4>What I Did</h4>
+                            <p class="placeholder-text">Placeholder: Describe what you accomplished in this milestone.</p>
+                        </div>
+
+                        <div class="milestone-field">
+                            <h4>Commands Used</h4>
+                            <pre class="code-block placeholder-text">Placeholder: Add terminal commands here</pre>
+                        </div>
+
+                        <div class="milestone-field">
+                            <h4>Screenshot</h4>
+                            <div class="screenshot-placeholder">
+                                <p>Placeholder: Add screenshot here</p>
+                            </div>
+                        </div>
+
+                        <div class="milestone-field">
+                            <h4>Problems I Faced</h4>
+                            <p class="placeholder-text">Placeholder: Document any issues you encountered.</p>
+                        </div>
+
+                        <div class="milestone-field">
+                            <h4>What I Learned</h4>
+                            <p class="placeholder-text">Placeholder: Reflect on key learnings.</p>
+                        </div>
+
+                        <div class="milestone-field">
+                            <h4>Production Connection</h4>
+                            <p class="placeholder-text">Placeholder: Explain how this applies to production.</p>
+                        </div>
+
+                        @if (categoryNotes.Any())
+                        {
+                            <div class="milestone-field related-notes">
+                                <h4>Related Notes</h4>
+                                @foreach (var note in categoryNotes)
+                                {
+                                    <div class="note-item">
+                                        <div class="note-header">
+                                            <strong>@note.Title</strong>
+                                            <span class="note-date">@note.CreatedAt.ToLocalTime().ToString("g")</span>
+                                        </div>
+                                        <p class="note-content">@note.Content</p>
+                                        @if (isEditMode)
+                                        {
+                                            <button class="btn btn-sm btn-outline-danger btn-delete-note" @onclick="() => DeleteNoteAsync(note.Id)">Delete note</button>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- ADD NOTE FORM (COLLAPSIBLE, ONLY IN EDIT MODE) -->
+@if (isEditMode)
+{
+    <section class="doc-section edit-section">
+        <div class="edit-form-card">
+            <button class="btn btn-link edit-form-toggle" @onclick="ToggleEditForm" type="button">
+                <span>@(showEditForm ? "?" : "?")</span> Add New Note
+            </button>
+
+            @if (showEditForm)
+            {
+                <div class="edit-form-content">
+                    <EditForm Model="newNote" OnValidSubmit="CreateNoteAsync">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Note Title</label>
+                            <InputText class="form-control" @bind-Value="newNote.Title" placeholder="Enter a title for this note" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Milestone Category</label>
+                            <InputSelect class="form-select" @bind-Value="selectedCategoryDisplay" onchange="OnCategoryChanged">
+                                <option value="">Select a category...</option>
+                                @foreach (DocumentationCategory cat in Enum.GetValues(typeof(DocumentationCategory)))
+                                {
+                                    <option value="@EnumDisplayHelper.GetDisplayName(cat)">@EnumDisplayHelper.GetDisplayName(cat)</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Note Content</label>
+                            <InputTextArea class="form-control" @bind-Value="newNote.Content" Rows="4" placeholder="Write your note here..." />
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit">Save Note</button>
+                            <button class="btn btn-secondary" type="button" @onclick="ClearForm">Clear</button>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(errorMessage))
+                        {
+                            <div class="alert alert-danger mt-3" role="alert">
+                                @errorMessage
+                            </div>
+                        }
+                    </EditForm>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    private List<DeploymentNoteDto> notes = new();
+    private CreateDeploymentNoteDto newNote = new();
+    private bool isLoading = true;
+    private string? errorMessage;
+    private HealthStatusDto? healthStatus;
+
+    // Temporary UI-only edit mode. Real protection must be implemented in the API with authentication/authorization.
+    private bool isEditMode = false;
+    private bool showEditForm = false;
+
+    // selectedCategoryDisplay holds the user-facing label; the backend still receives a string category.
+    private string selectedCategoryDisplay = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadHealthStatusAsync();
+        await LoadNotesAsync();
+    }
+
+    private async Task LoadHealthStatusAsync()
+    {
+        try
+        {
+            healthStatus = await HealthApiClient.GetHealthAsync();
+        }
+        catch
+        {
+            healthStatus = new HealthStatusDto
+            {
+                Status = "Unreachable",
+                Database = "Unknown",
+                Environment = "Unknown",
+                Timestamp = DateTime.UtcNow
+            };
+        }
+    }
+
+    private async Task LoadNotesAsync()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            notes = await NotesApiClient.GetNotesAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Could not load notes. Is the API running? Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OnCategoryChanged(ChangeEventArgs e)
+    {
+        selectedCategoryDisplay = e?.Value?.ToString() ?? string.Empty;
+        newNote.Category = selectedCategoryDisplay;
+    }
+
+    private void ClearForm()
+    {
+        newNote = new CreateDeploymentNoteDto();
+        selectedCategoryDisplay = string.Empty;
+    }
+
+    private void ToggleEditForm()
+    {
+        showEditForm = !showEditForm;
+    }
+
+    private async Task CreateNoteAsync()
+    {
+        errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(newNote.Title) ||
+            string.IsNullOrWhiteSpace(newNote.Category) ||
+            string.IsNullOrWhiteSpace(newNote.Content))
+        {
+            errorMessage = "Please fill in title, category and content.";
+            return;
+        }
+
+        var createdNote = await NotesApiClient.CreateNoteAsync(newNote);
+
+        if (createdNote is null)
+        {
+            errorMessage = "Could not create note.";
+            return;
+        }
+
+        ClearForm();
+        showEditForm = false;
+        await LoadNotesAsync();
+    }
+
+    private async Task DeleteNoteAsync(int id)
+    {
+        try
+        {
+            await NotesApiClient.DeleteNoteAsync(id);
+            await LoadNotesAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Could not delete note. Error: {ex.Message}";
+        }
+    }
+}
