@@ -6,181 +6,163 @@
 @inject IHealthApiClient HealthApiClient
 @inject IDocumentationApiClient DocumentationApiClient
 
-<!-- HERO SECTION -->
-<section class="hero-section">
-    <div class="hero-content">
-        <h1 class="hero-title">Hi! I'm Victoria and this is my experience in how I used 3 weeks on learning about deployment</h1>
-        <p class="hero-subtitle">A full-stack deployment learning project with Blazor, ASP.NET Core, EF Core and SQL Server.</p>
-        <div class="hero-badges">
-            <span class="badge-tech">Blazor WASM</span>
-            <span class="badge-tech">ASP.NET Core API</span>
-            <span class="badge-tech">EF Core</span>
-            <span class="badge-tech">SQL Server</span>
-            <span class="badge-tech">Docker-ready</span>
+<div class="documentation-page">
+    <section class="journey-hero">
+        <div class="journey-hero-content">
+            <p class="journey-eyebrow">Deployment learning portfolio</p>
+            <h1 class="journey-title">Victoria's Deployment Journey</h1>
+            <p class="journey-subtitle">
+                Documentation report of a 3-week deployment and DevOps course, including implementation notes,
+                infrastructure decisions, troubleshooting, and learning reflections.
+            </p>
+            <div class="journey-badges">
+                <span class="journey-badge">Blazor WASM</span>
+                <span class="journey-badge">ASP.NET Core API</span>
+                <span class="journey-badge">SQL Server</span>
+                <span class="journey-badge">Docker</span>
+                <span class="journey-badge">Deployment</span>
+                <span class="journey-badge">Linux</span>
+                <span class="journey-badge">Tunnels</span>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- PROJECT STATUS BAR -->
-<section class="status-bar">
-    <div class="status-container">
-        @if (healthStatus is null)
-        {
-            <div class="status-item">
-                <span class="status-label">Backend Status:</span>
-                <span class="status-value checking">Checking...</span>
-            </div>
-        }
-        else
-        {
-            var healthy = !string.IsNullOrWhiteSpace(healthStatus.Status) && healthStatus.Status.Contains("healthy", StringComparison.OrdinalIgnoreCase);
-            <div class="status-item">
-                <span class="status-label">Backend:</span>
-                <span class="status-value @(healthy ? "healthy" : "unreachable")">@healthStatus.Status</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Database:</span>
-                <span class="status-value @(healthy ? "healthy" : "unreachable")">@healthStatus.Database</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Environment:</span>
-                <span class="status-value">@healthStatus.Environment</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Checked:</span>
-                <span class="status-value">@healthStatus.Timestamp.ToLocalTime().ToString("g")</span>
-            </div>
-        }
-
-        <div class="status-edit-mode">
-            <!-- Temporary UI-only edit mode. Real protection must be implemented in the API with authentication/authorization. -->
-            <label class="edit-mode-label">
-                <input type="checkbox" @bind="isEditMode" />
-                <span>Edit mode</span>
-            </label>
-        </div>
-    </div>
-</section>
-
-<!-- DOCUMENTATION INTRODUCTION -->
-<section class="doc-section intro-section">
-    <h2>About This Documentation</h2>
-    <p>
-        This page documents my journey of learning real-world deployment over 3 weeks. Each section below covers a key topic from the DevOps course, 
-        including what I did, commands I executed, problems I encountered, and what I learned. At the end, you'll find evidence of deployment and a final reflection.
-    </p>
-    <p class="requirement-note">
-        <strong>Documentation Target:</strong> At least 14,400 characters, including terminal commands, screenshots, reflections and deployment proof.
-    </p>
-</section>
-
-<!-- PROGRESS SECTION -->
-<section class="doc-section progress-section">
-    <h2>Documentation Progress</h2>
-    <div class="progress-items">
-        <div class="progress-item">
-            <div class="progress-label">Written Documentation</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-        <div class="progress-item">
-            <div class="progress-label">Commands</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-        <div class="progress-item">
-            <div class="progress-label">Screenshots</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-        <div class="progress-item">
-            <div class="progress-label">Reflections</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-        <div class="progress-item">
-            <div class="progress-label">Deployment Proof</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- MILESTONE SECTIONS -->
-<section class="milestones-container">
-    <div class="accordion" id="milestonesAccordion">
-        @foreach (var milestone in milestones)
-        {
-            var categoryName = milestone.CategoryDisplayName;
-			var categoryKey = milestone.Category.ToString();
-
-            <div class="milestone-content">
-                @if (string.IsNullOrWhiteSpace(milestone.DocumentationContent))
-                {
-                    <p class="placeholder-text">
-                        Placeholder: Add documentation content for this milestone.
-                    </p>
-                }
-                else
-                {
-                    <p>@milestone.DocumentationContent</p>
-                }
-            </div>
-            @if (isEditMode && editingMilestone?.Id == milestone.Id)
+    <section class="journey-status-strip">
+        <div class="journey-status-content">
+            @if (healthStatus is null)
             {
-                <div class="milestone-edit-form">
-                    <label>Section title</label>
-                    <input class="form-control"
-                           @bind="editModel.CategoryDisplayName" />
-
-                    <label>Documentation content</label>
-                    <textarea class="form-control documentation-editor"
-                              @bind="editModel.DocumentationContent"></textarea>
-
-                    <div class="edit-actions">
-                        <button class="btn btn-primary" @onclick="SaveMilestoneAsync">
-                            Save
-                        </button>
-
-                        <button class="btn btn-secondary" @onclick="CancelEditingMilestone">
-                            Cancel
-                        </button>
-                    </div>
+                <div class="journey-health-list">
+                    <span class="journey-health-pill">API: Checking...</span>
+                    <span class="journey-health-pill">Database: Checking...</span>
                 </div>
             }
             else
             {
-                <h2>@milestone.CategoryDisplayName</h2>
+                var apiHealthy = !string.IsNullOrWhiteSpace(healthStatus.Status) && healthStatus.Status.Contains("healthy", StringComparison.OrdinalIgnoreCase);
+                var dbHealthy = !string.IsNullOrWhiteSpace(healthStatus.Database) && healthStatus.Database.Contains("healthy", StringComparison.OrdinalIgnoreCase);
+                <div class="journey-health-list">
+                    <span class="journey-health-pill @(apiHealthy ? "is-healthy" : "is-unhealthy")">API: @healthStatus.Status</span>
+                    <span class="journey-health-pill @(dbHealthy ? "is-healthy" : "is-unhealthy")">Database: @healthStatus.Database</span>
+                    <span class="journey-health-pill">Environment: @healthStatus.Environment</span>
+                    <span class="journey-health-pill">Checked: @healthStatus.Timestamp.ToLocalTime().ToString("g")</span>
+                </div>
+            }
 
-                <div class="milestone-content">
-                    @if (string.IsNullOrWhiteSpace(milestone.DocumentationContent))
+            <label class="journey-edit-toggle">
+                <input type="checkbox" @bind="isEditMode" />
+                <span>Edit mode</span>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="journey-alert" role="alert">@errorMessage</div>
+    }
+
+    <section class="journey-snapshot-grid">
+        <article class="snapshot-card">
+            <p class="snapshot-label">Milestones</p>
+            <p class="snapshot-value">@milestones.Count</p>
+            <p class="snapshot-hint">Documentation chapters</p>
+        </article>
+        <article class="snapshot-card">
+            <p class="snapshot-label">Completed sections</p>
+            <p class="snapshot-value">@milestones.Count(m => !string.IsNullOrWhiteSpace(m.DocumentationContent))</p>
+            <p class="snapshot-hint">With written content</p>
+        </article>
+        <article class="snapshot-card">
+            <p class="snapshot-label">Last updated</p>
+            <p class="snapshot-value snapshot-value-date">@(milestones.Count == 0 ? "-" : milestones.Max(m => m.UpdatedAt).ToLocalTime().ToString("dd MMM"))</p>
+            <p class="snapshot-hint">Most recent change</p>
+        </article>
+    </section>
+
+    <section class="documentation-report-layout">
+        <aside class="toc-panel">
+            <h2>Table of Contents</h2>
+            @if (milestones.Count == 0)
+            {
+                <p class="toc-empty">No milestones loaded.</p>
+            }
+            else
+            {
+                <ol class="toc-list">
+                    @for (var i = 0; i < milestones.Count; i++)
                     {
-                        <p class="placeholder-text">
-                            Placeholder: Add documentation content for this milestone.
-                        </p>
+                        var milestone = milestones[i];
+                        <li>
+                            <a href="#milestone-@milestone.Id">
+                                <span class="toc-icon">@GetSectionEmoji(milestone.CategoryDisplayName, i)</span>
+                                @((i + 1).ToString("D2")) · @milestone.CategoryDisplayName
+                            </a>
+                        </li>
+                    }
+                </ol>
+            }
+        </aside>
+
+        <div class="report-sections">
+            @for (var i = 0; i < milestones.Count; i++)
+            {
+                var milestone = milestones[i];
+                var themeClass = GetThemeClass(i);
+                var sectionEmoji = GetSectionEmoji(milestone.CategoryDisplayName, i);
+
+                <article class="report-section-card @themeClass" id="milestone-@milestone.Id">
+                    <header class="report-section-header">
+                        <div class="report-section-title-wrap">
+                            <span class="report-section-index">@((i + 1).ToString("D2"))</span>
+                            <div>
+                                <h3><span class="section-emoji">@sectionEmoji</span>@milestone.CategoryDisplayName</h3>
+                                <p class="report-section-meta">Updated @milestone.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
+                            </div>
+                        </div>
+
+                        @if (isEditMode && editingMilestone?.Id != milestone.Id)
+                        {
+                            <button class="btn btn-outline-secondary report-edit-button"
+                                    @onclick="() => StartEditingMilestone(milestone)">
+                                Edit section
+                            </button>
+                        }
+                    </header>
+
+                    @if (isEditMode && editingMilestone?.Id == milestone.Id)
+                    {
+                        <div class="milestone-edit-form">
+                            <label class="edit-label">Section title</label>
+                            <input class="form-control"
+                                   @bind="editModel.CategoryDisplayName" />
+
+                            <label class="edit-label">Documentation content</label>
+                            <textarea class="form-control documentation-editor"
+                                      @bind="editModel.DocumentationContent"></textarea>
+
+                            <div class="edit-actions">
+                                <button class="btn btn-primary" @onclick="SaveMilestoneAsync">Save</button>
+                                <button class="btn btn-secondary" @onclick="CancelEditingMilestone">Cancel</button>
+                            </div>
+                        </div>
                     }
                     else
                     {
-                        <p>@milestone.DocumentationContent</p>
+                        <div class="report-section-body">
+                            @if (string.IsNullOrWhiteSpace(milestone.DocumentationContent))
+                            {
+                                <p class="milestone-placeholder">Documentation for this milestone has not been added yet.</p>
+                            }
+                            else
+                            {
+                                <p class="milestone-documentation">@milestone.DocumentationContent</p>
+                            }
+                        </div>
                     }
-                </div>
-
-                @if (isEditMode)
-                {
-                    <button class="btn btn-outline-primary"
-                            @onclick="() => StartEditingMilestone(milestone)">
-                        Edit section
-                    </button>
-                }
+                </article>
             }
-        }
-    </div>
-</section>
+        </div>
+    </section>
+</div>
 
 
 
@@ -279,5 +261,33 @@
     private void ToggleEditForm()
     {
         showEditForm = !showEditForm;
+    }
+
+    private static string GetThemeClass(int index)
+    {
+        var themes = new[] { "theme-blue", "theme-violet", "theme-teal" };
+        return themes[index % themes.Length];
+    }
+
+    private static string GetSectionEmoji(string? categoryDisplayName, int index)
+    {
+        if (string.IsNullOrWhiteSpace(categoryDisplayName))
+        {
+            var defaults = new[] { "??", "??", "??", "???", "??", "??" };
+            return defaults[index % defaults.Length];
+        }
+
+        var name = categoryDisplayName.ToLowerInvariant();
+
+        if (name.Contains("docker") || name.Contains("container")) return "??";
+        if (name.Contains("linux") || name.Contains("server")) return "??";
+        if (name.Contains("deploy") || name.Contains("release")) return "??";
+        if (name.Contains("database") || name.Contains("sql")) return "???";
+        if (name.Contains("api") || name.Contains("backend")) return "??";
+        if (name.Contains("test") || name.Contains("troubleshoot")) return "??";
+        if (name.Contains("security") || name.Contains("auth")) return "??";
+
+        var fallbacks = new[] { "??", "???", "??", "??", "??", "??" };
+        return fallbacks[index % fallbacks.Length];
     }
 }
