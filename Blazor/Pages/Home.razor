@@ -2,7 +2,6 @@
 @using DomainModels.Dto
 @using DomainModels.Models
 @using Blazor.Interfaces
-@using Blazor.Helpers
 @inject IHealthApiClient HealthApiClient
 @inject IDocumentationApiClient DocumentationApiClient
 
@@ -93,7 +92,6 @@
                         var milestone = milestones[i];
                         <li>
                             <a href="#milestone-@milestone.Id">
-                                <span class="toc-icon">@GetSectionEmoji(milestone.CategoryDisplayName, i)</span>
                                 @((i + 1).ToString("D2")) · @milestone.CategoryDisplayName
                             </a>
                         </li>
@@ -107,15 +105,13 @@
             {
                 var milestone = milestones[i];
                 var themeClass = GetThemeClass(i);
-                var sectionEmoji = GetSectionEmoji(milestone.CategoryDisplayName, i);
 
                 <article class="report-section-card @themeClass" id="milestone-@milestone.Id">
                     <header class="report-section-header">
                         <div class="report-section-title-wrap">
                             <span class="report-section-index">@((i + 1).ToString("D2"))</span>
                             <div>
-                                <h3><span class="section-emoji">@sectionEmoji</span>@milestone.CategoryDisplayName</h3>
-                                <p class="report-section-meta">Updated @milestone.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
+                               <p class="report-section-meta">Updated @milestone.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
                             </div>
                         </div>
 
@@ -168,15 +164,11 @@
 
 @code {
     private List<DocumentationMilestoneDto> milestones = new();
-    private bool isLoading = true;
     private string? errorMessage;
     private HealthStatusDto? healthStatus;
     private DocumentationMilestoneDto? editingMilestone;
     private UpdateDocumentationMilestoneDto editModel = new();
-
     private bool isEditMode = false;
-    private bool showEditForm = false;
-    private string selectedCategoryDisplay = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -258,36 +250,9 @@
         editModel = new UpdateDocumentationMilestoneDto();
     }
 
-    private void ToggleEditForm()
-    {
-        showEditForm = !showEditForm;
-    }
-
     private static string GetThemeClass(int index)
     {
         var themes = new[] { "theme-blue", "theme-violet", "theme-teal" };
         return themes[index % themes.Length];
-    }
-
-    private static string GetSectionEmoji(string? categoryDisplayName, int index)
-    {
-        if (string.IsNullOrWhiteSpace(categoryDisplayName))
-        {
-            var defaults = new[] { "??", "??", "??", "???", "??", "??" };
-            return defaults[index % defaults.Length];
-        }
-
-        var name = categoryDisplayName.ToLowerInvariant();
-
-        if (name.Contains("docker") || name.Contains("container")) return "??";
-        if (name.Contains("linux") || name.Contains("server")) return "??";
-        if (name.Contains("deploy") || name.Contains("release")) return "??";
-        if (name.Contains("database") || name.Contains("sql")) return "???";
-        if (name.Contains("api") || name.Contains("backend")) return "??";
-        if (name.Contains("test") || name.Contains("troubleshoot")) return "??";
-        if (name.Contains("security") || name.Contains("auth")) return "??";
-
-        var fallbacks = new[] { "??", "???", "??", "??", "??", "??" };
-        return fallbacks[index % fallbacks.Length];
     }
 }
