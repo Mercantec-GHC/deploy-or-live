@@ -48,9 +48,15 @@
             }
 
             <label class="journey-edit-toggle">
-                <input type="checkbox" @bind="isEditMode" />
+                <input type="checkbox" @bind="isEditMode" disabled="@string.IsNullOrWhiteSpace(editApiKey)" />
                 <span>Edit mode</span>
             </label>
+
+            <input type="password"
+                   class="form-control"
+                   style="max-width: 220px;"
+                   placeholder="Enter edit key"
+                   @bind="editApiKey" />
         </div>
     </section>
 
@@ -169,6 +175,7 @@
     private DocumentationMilestoneDto? editingMilestone;
     private UpdateDocumentationMilestoneDto editModel = new();
     private bool isEditMode = false;
+    private string editApiKey = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -231,11 +238,12 @@
 
         var updatedMilestone = await DocumentationApiClient.UpdateMilestoneAsync(
             editingMilestone.Category,
-            editModel);
+            editModel,
+            editApiKey);
 
         if (updatedMilestone is null)
         {
-            errorMessage = "Could not update documentation milestone.";
+            errorMessage = "Could not update documentation milestone. Check your edit key.";
             return;
         }
 

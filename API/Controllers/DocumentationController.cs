@@ -11,10 +11,14 @@ namespace API.Controllers;
 public class DocumentationController : ControllerBase
 {
 	private readonly AppDbContext _dbContext;
+	private readonly string _documentationEditApiKey;
+	private const string EditApiKeyHeaderName = "X-Documentation-Edit-Key";
 
-	public DocumentationController(AppDbContext dbContext)
+  public DocumentationController(AppDbContext dbContext, IConfiguration configuration)
 	{
 		_dbContext = dbContext;
+       _documentationEditApiKey = configuration["DocumentationEditApiKey"]
+			?? throw new InvalidOperationException("DocumentationEditApiKey is missing from configuration.");
 	}
 
 	[HttpGet]
@@ -64,7 +68,12 @@ public class DocumentationController : ControllerBase
 	DocumentationCategory category,
 	UpdateDocumentationMilestoneDto updateDto)
 	{
-		// TODO: Protect this endpoint with authentication/authorization before production.
+     if (!Request.Headers.TryGetValue(EditApiKeyHeaderName, out var providedApiKey)
+			|| !string.Equals(providedApiKey, _documentationEditApiKey, StringComparison.Ordinal))
+		{
+			return Unauthorized("Invalid edit key.");
+		}
+
 		var milestone = await _dbContext.DocumentationMilestones
 			.FirstOrDefaultAsync(milestone => milestone.Category == category);
 

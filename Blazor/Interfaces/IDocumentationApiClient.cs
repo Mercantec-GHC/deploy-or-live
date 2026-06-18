@@ -11,5 +11,6 @@ public interface IDocumentationApiClient
 
 	Task<DocumentationMilestoneDto?> UpdateMilestoneAsync(
 		DocumentationCategory category,
-		UpdateDocumentationMilestoneDto updateDto);
+     UpdateDocumentationMilestoneDto updateDto,
+		string editApiKey);
 }

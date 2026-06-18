@@ -8,6 +8,7 @@ namespace Blazor.Services;
 public class DocumentationApiClient : IDocumentationApiClient
 {
 	private readonly HttpClient _httpClient;
+	private const string EditApiKeyHeaderName = "X-Documentation-Edit-Key";
 
 	public DocumentationApiClient(HttpClient httpClient)
 	{
@@ -27,9 +28,17 @@ public class DocumentationApiClient : IDocumentationApiClient
 	}
 	public async Task<DocumentationMilestoneDto?> UpdateMilestoneAsync(
 	DocumentationCategory category,
-	UpdateDocumentationMilestoneDto updateDto)
+  UpdateDocumentationMilestoneDto updateDto,
+	string editApiKey)
 	{
-		var response = await _httpClient.PutAsJsonAsync($"api/documentation/{category}", updateDto);
+        using var request = new HttpRequestMessage(HttpMethod.Put, $"api/documentation/{category}")
+		{
+			Content = JsonContent.Create(updateDto)
+		};
+
+		request.Headers.Add(EditApiKeyHeaderName, editApiKey);
+
+		var response = await _httpClient.SendAsync(request);
 
 		if (!response.IsSuccessStatusCode)
 		{

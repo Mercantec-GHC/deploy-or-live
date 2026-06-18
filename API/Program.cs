@@ -1,6 +1,7 @@
 using API.Data;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,31 @@ builder.Services.AddCors(options =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+	options.AddSecurityDefinition("DocumentationEditKey", new OpenApiSecurityScheme
+	{
+		Description = "API key needed to edit documentation. Enter only the key value.",
+		Type = SecuritySchemeType.ApiKey,
+		Name = "X-Documentation-Edit-Key",
+		In = ParameterLocation.Header
+	});
+
+	options.AddSecurityRequirement(new OpenApiSecurityRequirement
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Reference = new OpenApiReference
+				{
+					Type = ReferenceType.SecurityScheme,
+					Id = "DocumentationEditKey"
+				}
+			},
+			Array.Empty<string>()
+		}
+	});
+});
 
 var app = builder.Build();
 
