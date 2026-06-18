@@ -17,8 +17,13 @@ public class DocumentationController : ControllerBase
   public DocumentationController(AppDbContext dbContext, IConfiguration configuration)
 	{
 		_dbContext = dbContext;
-       _documentationEditApiKey = configuration["DocumentationEditApiKey"]
+      _documentationEditApiKey = configuration["DocumentationEditApiKey"]?.Trim()
 			?? throw new InvalidOperationException("DocumentationEditApiKey is missing from configuration.");
+
+		if (string.IsNullOrWhiteSpace(_documentationEditApiKey))
+		{
+			throw new InvalidOperationException("DocumentationEditApiKey is empty. Set a non-empty value (for development, use User Secrets).");
+		}
 	}
 
 	[HttpGet]
@@ -69,7 +74,7 @@ public class DocumentationController : ControllerBase
 	UpdateDocumentationMilestoneDto updateDto)
 	{
      if (!Request.Headers.TryGetValue(EditApiKeyHeaderName, out var providedApiKey)
-			|| !string.Equals(providedApiKey, _documentationEditApiKey, StringComparison.Ordinal))
+			|| !string.Equals(providedApiKey.ToString().Trim(), _documentationEditApiKey, StringComparison.Ordinal))
 		{
 			return Unauthorized("Invalid edit key.");
 		}
