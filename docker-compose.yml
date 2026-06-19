@@ -21,6 +21,7 @@ services:
     environment:
      ASPNETCORE_ENVIRONMENT: Production
      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=${DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;"
+     DocumentationEditApiKey: "${DOCUMENTATION_EDIT_API_KEY}"
     depends_on:
       sqlserver:
         condition: service_healthy
