@@ -1,0 +1,31 @@
+services:
+ sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest 
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "R7LCB7CU"
+    ports: 
+        - "1433:1433"
+    volumes:
+        - sqlserver_data:/var/opt/mssql
+    healthcheck:
+        test: ["CMD-SHELL", "pgrep sqlservr || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 10
+ api:
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    container_name: dodlj-api
+    environment:
+     ASPNETCORE_ENVIRONMENT: Production
+     ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=master;User Id=sa;Password=R7LCB7CU;TrustServerCertificate=True;"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    ports:
+      - "5000:8080"
+    
+volumes:
+  sqlserver_data:

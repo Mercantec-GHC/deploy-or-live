@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Project Path="API/API.csproj" />
   <Project Path="Blazor/Blazor.csproj" />
   <Project Path="DomainModels/DomainModels.csproj" />
