@@ -26,6 +26,15 @@ services:
         condition: service_healthy
     ports:
       - "5000:8080"
+ blazor:
+    build:
+       context: .
+       dockerfile: Blazor/Dockerfile
+    container_name: dodlj-blazor
+    depends_on:
+      - api
+    ports:
+     - "8080:80"
     
 volumes:
   sqlserver_data:
