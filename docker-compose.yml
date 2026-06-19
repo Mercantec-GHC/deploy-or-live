@@ -3,9 +3,9 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest 
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "R7LCB7CU"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
     ports: 
-        - "1433:1433"
+        - "127.0.0.1:1433:1433"
     volumes:
         - sqlserver_data:/var/opt/mssql
     healthcheck:
@@ -20,7 +20,7 @@ services:
     container_name: dodlj-api
     environment:
      ASPNETCORE_ENVIRONMENT: Production
-     ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=master;User Id=sa;Password=R7LCB7CU;TrustServerCertificate=True;"
+     ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=${DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;"
     depends_on:
       sqlserver:
         condition: service_healthy
