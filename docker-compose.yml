@@ -9,10 +9,11 @@ services:
     volumes:
         - sqlserver_data:/var/opt/mssql
     healthcheck:
-        test: ["CMD-SHELL", "pgrep sqlservr || exit 1"]
+        test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\" || exit 1"]
         interval: 10s
         timeout: 5s
-        retries: 10
+        retries: 20
+        start_period: 30s
     networks:
       - dodlj_network
  api:
@@ -28,6 +29,12 @@ services:
         condition: service_healthy
     ports:
       - "5000:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - dodlj_network
  blazor:
