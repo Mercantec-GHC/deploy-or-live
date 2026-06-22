@@ -13,11 +13,12 @@ services:
         interval: 10s
         timeout: 5s
         retries: 10
+    networks:
+      - dodlj_network
  api:
     build:
       context: .
       dockerfile: API/Dockerfile
-    container_name: dodlj-api
     environment:
      ASPNETCORE_ENVIRONMENT: Production
      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=${DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;"
@@ -27,15 +28,21 @@ services:
         condition: service_healthy
     ports:
       - "5000:8080"
+    networks:
+      - dodlj_network
  blazor:
     build:
        context: .
        dockerfile: Blazor/Dockerfile
-    container_name: dodlj-blazor
     depends_on:
       - api
     ports:
      - "8080:80"
+    networks:
+      - dodlj_network
     
 volumes:
   sqlserver_data:
+  
+networks:
+  dodlj_network:
