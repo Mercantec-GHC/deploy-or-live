@@ -69,11 +69,52 @@ app.UseCors("AllowBlazorClient");
 app.UseAuthorization();
 
 app.MapControllers();
-using (var scope = app.Services.CreateScope())
-{
-	var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-	dbContext.Database.Migrate();
 
+await InitializeDatabaseAsync(app);
+
+static async Task InitializeDatabaseAsync(WebApplication webApp)
+{
+	// Number of times to retry before giving up (e.g. database container still starting).
+	const int maxRetryAttempts = 10;
+	var retryDelay = TimeSpan.FromSeconds(5);
+
+	var logger = webApp.Services.GetRequiredService<ILogger<Program>>();
+
+	for (var attempt = 1; attempt <= maxRetryAttempts; attempt++)
+	{
+		try
+		{
+			using var scope = webApp.Services.CreateScope();
+			var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+			dbContext.Database.Migrate();
+			SeedDocumentationMilestones(dbContext);
+
+			logger.LogInformation("Database migration and seeding completed successfully.");
+			return;
+		}
+		catch (Exception ex)
+		{
+			logger.LogWarning(
+				ex,
+				"Database initialization attempt {Attempt} of {MaxAttempts} failed. Retrying in {DelaySeconds}s...",
+				attempt,
+				maxRetryAttempts,
+				retryDelay.TotalSeconds);
+
+			if (attempt == maxRetryAttempts)
+			{
+				logger.LogError(ex, "Database initialization failed after {MaxAttempts} attempts.", maxRetryAttempts);
+				throw;
+			}
+
+			await Task.Delay(retryDelay);
+		}
+	}
+}
+
+static void SeedDocumentationMilestones(AppDbContext dbContext)
+{
 	foreach (DocumentationCategory category in Enum.GetValues(typeof(DocumentationCategory)))
 	{
 		var milestoneExists = dbContext.DocumentationMilestones
