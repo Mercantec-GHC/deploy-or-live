@@ -1,5 +1,4 @@
 # Deployment Journey Documentation Site
-# Deployment Journey Documentation Site
 
 A documentation website for a deployment and DevOps learning portfolio. The solution contains a Blazor WebAssembly frontend, an ASP.NET Core Web API backend, shared domain models, and SQL Server persistence.
 
@@ -15,7 +14,7 @@ The application is containerized with Docker and deployed on a virtual machine. 
 
 ## Main features
 
-- Documentation milestone cards based on the current krav sections.
+- Documentation milestone cards based on the current requirements sections.
 - Table of Contents links that navigate to each milestone card.
 - Editable milestone content through the UI using an edit key.
 - Static skills checklist showing learned and not-yet-learned course topics.
@@ -37,12 +36,6 @@ The website currently shows these milestone sections:
 6. Learning & Reflection
 
 Rows are not seeded into the database. The API derives the placeholder cards from `DocumentationCategoryEnum`, and a database row is created only when a section is saved from the UI.
-
-## Prerequisites
-
-- .NET 8 SDK
-- SQL Server Express for local development, or Docker Desktop for Docker-based development
-- PowerShell
 
 ## Local development without Docker
 
