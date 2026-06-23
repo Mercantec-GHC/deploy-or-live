@@ -88,9 +88,8 @@ static async Task InitializeDatabaseAsync(WebApplication webApp)
 			var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
 			dbContext.Database.Migrate();
-			SeedDocumentationMilestones(dbContext);
 
-			logger.LogInformation("Database migration and seeding completed successfully.");
+			logger.LogInformation("Database migration completed successfully.");
 			return;
 		}
 		catch (Exception ex)
@@ -111,47 +110,6 @@ static async Task InitializeDatabaseAsync(WebApplication webApp)
 			await Task.Delay(retryDelay);
 		}
 	}
-}
-
-static void SeedDocumentationMilestones(AppDbContext dbContext)
-{
-	foreach (DocumentationCategory category in Enum.GetValues(typeof(DocumentationCategory)))
-	{
-		var milestoneExists = dbContext.DocumentationMilestones
-			.Any(milestone => milestone.Category == category);
-
-		if (!milestoneExists)
-		{
-			dbContext.DocumentationMilestones.Add(new DocumentationMilestone
-			{
-				Category = category,
-				CategoryDisplayName = GetDefaultCategoryDisplayName(category),
-				DocumentationContent = string.Empty,
-				UpdatedAt = DateTime.UtcNow
-			});
-		}
-	}
-
-	dbContext.SaveChanges();
-}
-
-static string GetDefaultCategoryDisplayName(DocumentationCategory category)
-{
-	return category switch
-	{
-		DocumentationCategory.SshAndServerSecurity => "SSH & Server Security",
-		DocumentationCategory.DnsFirewallAndDomain => "DNS, Firewall & Domain",
-		DocumentationCategory.DatabaseSetup => "Database Setup",
-		DocumentationCategory.NginxHttpsAndReverseProxy => "Nginx, HTTPS & Reverse Proxy",
-		DocumentationCategory.DockerFundamentals => "Docker Fundamentals",
-		DocumentationCategory.DockerCompose => "Docker Compose",
-		DocumentationCategory.VolumesPersistenceAndNetworking => "Volumes, Persistence & Networking",
-		DocumentationCategory.DokployGithubAndCiCd => "Dokploy, GitHub & CI/CD",
-		DocumentationCategory.MonitoringAndLogging => "Monitoring & Logging",
-		DocumentationCategory.OwaspAndSecurityHeaders => "OWASP & Security Headers",
-		DocumentationCategory.ContainerSecurityAndSecrets => "Container Security & Secrets",
-		_ => category.ToString()
-	};
 }
 
 app.Run();

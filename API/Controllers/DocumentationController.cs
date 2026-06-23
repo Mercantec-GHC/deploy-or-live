@@ -29,24 +29,34 @@ public class DocumentationController : ControllerBase
 	[HttpGet]
 	public async Task<ActionResult<List<DocumentationMilestoneDto>>> GetMilestones()
 	{
-		var milestones = await _dbContext.DocumentationMilestones
-			.OrderBy(milestone => milestone.Category)
-			.Select(milestone => new DocumentationMilestoneDto
+		var savedMilestones = await _dbContext.DocumentationMilestones
+			.ToDictionaryAsync(milestone => milestone.Category);
+
+		var milestones = Enum.GetValues<DocumentationCategoryEnum>()
+			.OrderBy(category => (int)category)
+			.Select(category =>
 			{
-				Id = milestone.Id,
-				Category = milestone.Category,
-				CategoryDisplayName = GetCategoryDisplayName(milestone.Category),
-				DocumentationContent = milestone.DocumentationContent,
-				UpdatedAt = milestone.UpdatedAt
+				savedMilestones.TryGetValue(category, out var saved);
+
+				return new DocumentationMilestoneDto
+				{
+					Id = saved?.Id ?? 0,
+					Category = category,
+					CategoryDisplayName = string.IsNullOrWhiteSpace(saved?.CategoryDisplayName)
+						? GetCategoryDisplayName(category)
+						: saved.CategoryDisplayName,
+					DocumentationContent = saved?.DocumentationContent ?? string.Empty,
+					UpdatedAt = saved?.UpdatedAt ?? DateTime.UtcNow
+				};
 			})
-			.ToListAsync();
+			.ToList();
 
 		return Ok(milestones);
 	}
 
 	[HttpGet("{category}")]
 	public async Task<ActionResult<DocumentationMilestoneDto>> GetMilestoneByCategory(
-		DocumentationCategory category)
+		DocumentationCategoryEnum category)
 	{
 		var milestone = await _dbContext.DocumentationMilestones
 			.Where(milestone => milestone.Category == category)
@@ -70,7 +80,7 @@ public class DocumentationController : ControllerBase
 
 	[HttpPut("{category}")]
 	public async Task<ActionResult<DocumentationMilestoneDto>> UpdateMilestone(
-	DocumentationCategory category,
+	DocumentationCategoryEnum category,
 	UpdateDocumentationMilestoneDto updateDto)
 	{
      if (!Request.Headers.TryGetValue(EditApiKeyHeaderName, out var providedApiKey)
@@ -79,12 +89,18 @@ public class DocumentationController : ControllerBase
 			return Unauthorized("Invalid edit key.");
 		}
 
+		if (!Enum.IsDefined(category))
+		{
+			return BadRequest("Unknown documentation category.");
+		}
+
 		var milestone = await _dbContext.DocumentationMilestones
 			.FirstOrDefaultAsync(milestone => milestone.Category == category);
 
 		if (milestone is null)
 		{
-			return NotFound();
+			milestone = new DocumentationMilestone { Category = category };
+			_dbContext.DocumentationMilestones.Add(milestone);
 		}
 
 		milestone.CategoryDisplayName = updateDto.CategoryDisplayName;
@@ -106,21 +122,16 @@ public class DocumentationController : ControllerBase
 			UpdatedAt = milestone.UpdatedAt
 		};
 	}
-	private static string GetCategoryDisplayName(DocumentationCategory category)
+	private static string GetCategoryDisplayName(DocumentationCategoryEnum category)
 	{
 		return category switch
 		{
-			DocumentationCategory.SshAndServerSecurity => "SSH & Server Security",
-			DocumentationCategory.DnsFirewallAndDomain => "DNS, Firewall & Domain",
-			DocumentationCategory.DatabaseSetup => "Database Setup",
-			DocumentationCategory.NginxHttpsAndReverseProxy => "Nginx, HTTPS & Reverse Proxy",
-			DocumentationCategory.DockerFundamentals => "Docker Fundamentals",
-			DocumentationCategory.DockerCompose => "Docker Compose",
-			DocumentationCategory.VolumesPersistenceAndNetworking => "Volumes, Persistence & Networking",
-			DocumentationCategory.DokployGithubAndCiCd => "Dokploy, GitHub & CI/CD",
-			DocumentationCategory.MonitoringAndLogging => "Monitoring & Logging",
-			DocumentationCategory.OwaspAndSecurityHeaders => "OWASP & Security Headers",
-			DocumentationCategory.ContainerSecurityAndSecrets => "Container Security & Secrets",
+			DocumentationCategoryEnum.ProjectDescription => "Project Description",
+			DocumentationCategoryEnum.InfrastructureAndDeployment => "Infrastructure & Deployment",
+			DocumentationCategoryEnum.CiCdPipeline => "CI/CD Pipeline",
+			DocumentationCategoryEnum.Security => "Security",
+			DocumentationCategoryEnum.MonitoringAndOperations => "Monitoring & Operations",
+			DocumentationCategoryEnum.LearningAndReflection => "Learning & Reflection",
 			_ => category.ToString()
 		};
 	}

@@ -40,7 +40,9 @@
             else
             {
                 var apiHealthy = !string.IsNullOrWhiteSpace(healthStatus.Status) && healthStatus.Status.Contains("healthy", StringComparison.OrdinalIgnoreCase);
-                var dbHealthy = !string.IsNullOrWhiteSpace(healthStatus.Database) && healthStatus.Database.Contains("healthy", StringComparison.OrdinalIgnoreCase);
+                var dbHealthy = !string.IsNullOrWhiteSpace(healthStatus.Database)
+                    && (healthStatus.Database.Contains("healthy", StringComparison.OrdinalIgnoreCase)
+                        || healthStatus.Database.Contains("connected", StringComparison.OrdinalIgnoreCase));
                 <div class="journey-health-list">
                     <span class="journey-health-pill @(apiHealthy ? "is-healthy" : "is-unhealthy")">API: @healthStatus.Status</span>
                     <span class="journey-health-pill @(dbHealthy ? "is-healthy" : "is-unhealthy")">Database: @healthStatus.Database</span>
@@ -85,6 +87,22 @@
         </article>
     </section>
 
+    <section class="skills-section">
+        <div class="skills-header">
+            <h2 class="skills-title">Skills Gained</h2>
+            <p class="skills-subtitle">An overview of the topics covered during the course.</p>
+        </div>
+        <ul class="skills-checklist">
+            @foreach (var skill in CourseSkills.All)
+            {
+                <li class="skill-item @(skill.IsAchieved ? "is-achieved" : "is-not-achieved")">
+                    <input type="checkbox" checked="@skill.IsAchieved" disabled />
+                    <span class="skill-name">@skill.Name</span>
+                </li>
+            }
+        </ul>
+    </section>
+
     <section class="documentation-report-layout">
         <aside class="toc-panel">
             <h2>Table of Contents</h2>
@@ -99,7 +117,7 @@
                     {
                         var milestone = milestones[i];
                         <li>
-                            <a href="#milestone-@milestone.Id">
+                            <a href="#milestone-@milestone.Category">
                                 @((i + 1).ToString("D2")) · @milestone.CategoryDisplayName
                             </a>
                         </li>
@@ -114,16 +132,17 @@
                 var milestone = milestones[i];
                 var themeClass = GetThemeClass(i);
 
-                <article class="report-section-card @themeClass" id="milestone-@milestone.Id">
+                <article class="report-section-card @themeClass" id="milestone-@milestone.Category">
                     <header class="report-section-header">
                         <div class="report-section-title-wrap">
                             <span class="report-section-index">@((i + 1).ToString("D2"))</span>
                             <div>
+                               <h3>@milestone.CategoryDisplayName</h3>
                                <p class="report-section-meta">Updated @milestone.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
                             </div>
                         </div>
 
-                        @if (isEditMode && editingMilestone?.Id != milestone.Id)
+                        @if (isEditMode && editingMilestone?.Category != milestone.Category)
                         {
                             <button class="btn btn-outline-secondary report-edit-button"
                                     @onclick="() => StartEditingMilestone(milestone)">
@@ -132,7 +151,7 @@
                         }
                     </header>
 
-                    @if (isEditMode && editingMilestone?.Id == milestone.Id)
+                    @if (isEditMode && editingMilestone?.Category == milestone.Category)
                     {
                         <div class="milestone-edit-form">
                             <label class="edit-label">Section title</label>
@@ -249,7 +268,7 @@
             return;
         }
 
-        var index = milestones.FindIndex(milestone => milestone.Id == updatedMilestone.Id);
+        var index = milestones.FindIndex(milestone => milestone.Category == updatedMilestone.Category);
 
         if (index >= 0)
         {

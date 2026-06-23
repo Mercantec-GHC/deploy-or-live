@@ -22,12 +22,12 @@ public class DocumentationApiClient : IDocumentationApiClient
 		return milestones ?? new List<DocumentationMilestoneDto>();
 	}
 
-	public async Task<DocumentationMilestoneDto?> GetMilestoneByCategoryAsync(DocumentationCategory category)
+	public async Task<DocumentationMilestoneDto?> GetMilestoneByCategoryAsync(DocumentationCategoryEnum category)
 	{
 		return await _httpClient.GetFromJsonAsync<DocumentationMilestoneDto>($"api/documentation/{category}");
 	}
 	public async Task<DocumentationMilestoneDto?> UpdateMilestoneAsync(
-	DocumentationCategory category,
+	DocumentationCategoryEnum category,
   UpdateDocumentationMilestoneDto updateDto,
 	string editApiKey)
 	{

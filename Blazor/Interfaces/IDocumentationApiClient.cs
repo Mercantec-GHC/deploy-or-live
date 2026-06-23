@@ -7,10 +7,10 @@ public interface IDocumentationApiClient
 {
 	Task<List<DocumentationMilestoneDto>> GetMilestonesAsync();
 
-	Task<DocumentationMilestoneDto?> GetMilestoneByCategoryAsync(DocumentationCategory category);
+	Task<DocumentationMilestoneDto?> GetMilestoneByCategoryAsync(DocumentationCategoryEnum category);
 
 	Task<DocumentationMilestoneDto?> UpdateMilestoneAsync(
-		DocumentationCategory category,
+		DocumentationCategoryEnum category,
      UpdateDocumentationMilestoneDto updateDto,
 		string editApiKey);
 }
