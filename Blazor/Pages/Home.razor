@@ -5,7 +5,7 @@
 @inject IHealthApiClient HealthApiClient
 @inject IDocumentationApiClient DocumentationApiClient
 
-<PageTitle>Victoria Documentation</PageTitle>
+<PageTitle>Victoria's Documentation</PageTitle>
 
 <div class="documentation-page">
     <section class="journey-hero">
@@ -13,17 +13,21 @@
             <p class="journey-eyebrow">Deployment learning portfolio</p>
             <h1 class="journey-title">Victoria's Deployment Journey</h1>
             <p class="journey-subtitle">
-                Documentation report of a 3-week deployment and DevOps course, including implementation notes,
+                Documentation report of a 3-week deployment and DevOps course "Deploy or Die", including implementation notes,
                 infrastructure decisions, troubleshooting, and learning reflections.
             </p>
             <div class="journey-badges">
-                <span class="journey-badge">Blazor WASM</span>
-                <span class="journey-badge">ASP.NET Core API</span>
-                <span class="journey-badge">SQL Server</span>
+                <span class="journey-badge">Blazor WebAssembly (.NET8)</span>
+                <span class="journey-badge">ASP.NET Core Web API (.NET8)</span>
+                <span class="journey-badge">MS SQL Server</span>
+                <span class="journey-badge">Nginx</span>
+                <span class="journey-badge">Cloudflare DNS</span>
                 <span class="journey-badge">Docker</span>
-                <span class="journey-badge">Deployment</span>
-                <span class="journey-badge">Linux</span>
-                <span class="journey-badge">Tunnels</span>
+                <span class="journey-badge">Docker Compose</span>
+                <span class="journey-badge">VM (Ubuntu Server)</span>
+                <span class="journey-badge">SSH</span>
+                <span class="journey-badge">GitHub</span>
+                <span class="journey-badge">Dokploy</span>
             </div>
         </div>
     </section>
@@ -112,7 +116,7 @@
             }
             else
             {
-                <ol class="toc-list">
+                <ul class="toc-list">
                     @for (var i = 0; i < milestones.Count; i++)
                     {
                         var milestone = milestones[i];
@@ -122,7 +126,7 @@
                             </a>
                         </li>
                     }
-                </ol>
+                </ul>
             }
         </aside>
 
@@ -137,8 +141,7 @@
                         <div class="report-section-title-wrap">
                             <span class="report-section-index">@((i + 1).ToString("D2"))</span>
                             <div>
-                               <h3>@milestone.CategoryDisplayName</h3>
-                               <p class="report-section-meta">Updated @milestone.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
+                               <h3>@milestone.CategoryDisplayName</h3>                               
                             </div>
                         </div>
 

@@ -696,7 +696,7 @@ code {
 
 .journey-subtitle {
     margin: 1rem 0 0;
-    max-width: 80ch;
+    max-width: 90%;
     color: #475569;
     font-size: 1.03rem;
     line-height: 1.75;
@@ -981,10 +981,6 @@ code {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-}
-
-.toc-icon {
-    font-size: 0.9rem;
 }
 
 .toc-list a:hover {

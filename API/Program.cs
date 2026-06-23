@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 	options.AddPolicy("AllowBlazorClient", policy =>
 	{
 		policy
-			.WithOrigins("http://localhost:5123", "http://10.133.51.145:8080", "https://victoria.merchantec.tech")
+			.WithOrigins("http://localhost:5123", "http://10.133.51.145:8080", "https://victoria.mercantec.tech")
 			.AllowAnyHeader()
 			.AllowAnyMethod();
 	});
