@@ -9,10 +9,19 @@ jobs:
   deploy:
     runs-on: self-hosted
 
-    steps:
+     steps:
       - name: Trigger Dokploy deployment locally
         run: |
-          curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" \
+          set -e
+
+          echo "Triggering Dokploy deployment..."
+
+          RESPONSE=$(curl -sS -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
             -H "X-GitHub-Event: push" \
-            -d '{"ref":"refs/heads/main","repository":{"full_name":"Mercantec-GHC/deploy-or-live"}}'
+            -d '{"ref":"refs/heads/main","repository":{"full_name":"Mercantec-GHC/deploy-or-live"}}')
+
+          echo "Dokploy response:"
+          echo "$RESPONSE"
+
+          echo "$RESPONSE" | grep -q "Compose deployed successfully"
