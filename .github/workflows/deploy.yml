@@ -7,17 +7,12 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Trigger Dokploy deployment over SSH
-        uses: appleboy/ssh-action@v1.2.2
-        with:
-          host: ${{ secrets.DOKPLOY_SSH_HOST }}
-          username: ${{ secrets.DOKPLOY_SSH_USER }}
-          key: ${{ secrets.DOKPLOY_SSH_KEY }}
-          script: |
-            curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" \
-              -H "Content-Type: application/json" \
-              -H "X-GitHub-Event: push" \
-              -d '{"ref":"refs/heads/main","repository":{"full_name":"Mercantec-GHC/deploy-or-live"}}'
+      - name: Trigger Dokploy deployment locally
+        run: |
+          curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: push" \
+            -d '{"ref":"refs/heads/main","repository":{"full_name":"Mercantec-GHC/deploy-or-live"}}'
