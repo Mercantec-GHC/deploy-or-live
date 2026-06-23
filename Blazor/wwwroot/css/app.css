@@ -1168,6 +1168,12 @@ code {
     background: linear-gradient(180deg, #ffffff, #f8fbff);
 }
 
+.milestone-character-count {
+    font-size: 0.82rem;
+    color: #475569;
+    text-align: right;
+}
+
 .edit-label {
     color: #334155;
     font-weight: 600;

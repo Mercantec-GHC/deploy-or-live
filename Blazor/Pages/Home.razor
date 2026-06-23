@@ -80,9 +80,9 @@
             <p class="snapshot-hint">Documentation chapters</p>
         </article>
         <article class="snapshot-card">
-            <p class="snapshot-label">Completed sections</p>
-            <p class="snapshot-value">@milestones.Count(m => !string.IsNullOrWhiteSpace(m.DocumentationContent))</p>
-            <p class="snapshot-hint">With written content</p>
+            <p class="snapshot-label">Total Characters</p>
+            <p class="snapshot-value">@TotalCharacterCount()</p>
+            <p class="snapshot-hint">Spaces included</p>
         </article>
         <article class="snapshot-card">
             <p class="snapshot-label">Last updated</p>
@@ -181,6 +181,7 @@
                             else
                             {
                                 <p class="milestone-documentation">@milestone.DocumentationContent</p>
+                                <p class="milestone-character-count">Character count: @CountCharacters(milestone)</p>
                             }
                         </div>
                     }
@@ -236,6 +237,22 @@
             errorMessage = $"Could not load documentation milestones. Is the API running? Error: {ex.Message}";
         }
     }
+
+    private int CountCharacters(DocumentationMilestoneDto milestone)
+    {
+        if (milestone is null || string.IsNullOrWhiteSpace(milestone.DocumentationContent))
+        {
+			return 0;
+        }
+        var characterCount = milestone.DocumentationContent.Length;
+		return characterCount;
+    }
+
+    private int TotalCharacterCount()
+    {
+        return milestones.Sum(m => CountCharacters(m));
+	}
+
     private void StartEditingMilestone(DocumentationMilestoneDto milestone)
     {
         editingMilestone = milestone;
