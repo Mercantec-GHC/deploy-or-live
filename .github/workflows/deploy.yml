@@ -9,8 +9,9 @@ jobs:
   deploy:
     runs-on: self-hosted
 
-     steps:
+    steps:
       - name: Trigger Dokploy deployment locally
+        shell: bash
         run: |
           set -e
 
