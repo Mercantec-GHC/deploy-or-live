@@ -21,5 +21,6 @@ public sealed record ImplementationScreenItem(
     string? Description,
     string? Snippet,
     string? Command,
-    string? ImageUrl,
+    string? ImageDescription,
+	string? ImageUrl,
     string? ImageAlt);

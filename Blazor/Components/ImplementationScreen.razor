@@ -1,34 +1,37 @@
 @if (Items.Count > 0)
-@if (Items.Count > 0)
-{
-    <div class="implementation-screen-section" aria-label="@AriaLabel">
-        <div class="implementation-screen-grid">
-            @foreach (var screen in Items)
-            {
-                <article class="implementation-screen-card">
-                    <h5>@screen.Title</h5>
+	@if (Items.Count > 0)
+	{
+		<div class="implementation-screen-section" aria-label="@AriaLabel">
+			<div class="implementation-screen-grid">
+				@foreach (var screen in Items)
+				{
+					<article class="implementation-screen-card">
+						<h5>@screen.Title</h5>
 
-                    @if (!string.IsNullOrWhiteSpace(screen.Description))
-                    {
-                        <p>@screen.Description</p>
-                    }
+						@if (!string.IsNullOrWhiteSpace(screen.Description))
+						{
+							<p>@screen.Description</p>
+						}
 
-                    @if (!string.IsNullOrWhiteSpace(screen.Snippet))
-                    {
-                        <pre><code>@screen.Snippet</code></pre>
-                    }
+						@if (!string.IsNullOrWhiteSpace(screen.Snippet))
+						{
+							<pre><code>@screen.Snippet</code></pre>
+						}
 
-                    @if (!string.IsNullOrWhiteSpace(screen.Command))
-                    {
-                        <pre><code>@screen.Command</code></pre>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(screen.ImageUrl))
-                    {
-                        <img src="@screen.ImageUrl" alt="@screen.ImageAlt" loading="lazy" />
-                    }
-                </article>
-            }
-        </div>
-    </div>
-}
+						@if (!string.IsNullOrWhiteSpace(screen.Command))
+						{
+							<pre><code>@screen.Command</code></pre>
+						}
+						@if (!string.IsNullOrWhiteSpace(screen.ImageDescription))
+						{
+							<h5 style="margin-top: .7rem;">@screen.ImageDescription</h5>
+						}
+						@if (!string.IsNullOrWhiteSpace(screen.ImageUrl))
+						{
+							<img src="@screen.ImageUrl" alt="@screen.ImageAlt" loading="lazy" />
+						}
+					</article>
+				}
+			</div>
+		</div>
+	}

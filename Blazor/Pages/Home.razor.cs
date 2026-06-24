@@ -153,7 +153,8 @@ public partial class Home
                     "\r\nSecurity: SSH, firewall, environment variables, edit key, security headers",					
                     null,
                     null,
-                    null)
+					null,
+					null)
 			},
 
             DocumentationCategoryEnum.InfrastructureAndDeployment => new[]
@@ -210,8 +211,10 @@ public partial class Home
                     - SQL Server container
                     """,
                     null,
-                    null,
-                    null)
+					"VM setup screenshot",
+					"images/implementation-screens/Screenshot-VM-setup.png",
+	                "VM setup screenshot"
+					)
             },
 
             DocumentationCategoryEnum.CiCdPipeline => new[]
@@ -222,7 +225,8 @@ public partial class Home
                     null,
                     null,
                     null,
-                    null)
+					null,
+					null)
             },
             _ => Array.Empty<ImplementationScreenItem>()
         };
