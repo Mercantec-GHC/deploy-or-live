@@ -133,6 +133,32 @@ public partial class Home
             DocumentationCategoryEnum.ProjectDescription => new[]
             {
                 new ImplementationScreenItem(
+                    "Full teck stach",
+					null,
+					"Frontend: Blazor WebAssembly (.NET 8)" +
+                    "\r\nBackend: ASP.NET Core Web API (.NET 8)" +
+                    "\r\nProgramming Language: C#" +
+                    "\r\nShared Models: .NET class library / DomainModels project" +
+                    "\r\nDatabase: Microsoft SQL Server 2022" +
+                    "\r\nDatabase Access: Entity Framework Core" +
+                    "\r\nFrontend Web Server: Nginx inside the Blazor container" +
+                    "\r\nReverse Proxy/Routing: Cloudflare Tunnel, Dokploy/Traefik, and Nginx for internal /api routing" +
+                    "\r\nContainerization: Docker, Docker Compose" +
+                    "\r\nServer OS: Ubuntu Server 24.04 LTS" +
+                    "\r\nDomain/DNS: Cloudflare DNS" +
+                    "\r\nHTTPS/TLS: Cloudflare-managed HTTPS/TLS through Cloudflare Tunnel" +
+                    "\r\nVersion Control: Git, GitHub" +
+                    "\r\nDeployment: Dokploy with Docker Compose" +
+                    "\r\nMonitoring: Docker logs, health checks, Dokploy monitoring" +
+                    "\r\nSecurity: SSH, firewall, environment variables, edit key, security headers",					
+                    null,
+                    null,
+                    null)
+			},
+
+            DocumentationCategoryEnum.InfrastructureAndDeployment => new[]
+            {
+                new ImplementationScreenItem(
                     "System architecture",
                     null,
 					"""
@@ -163,23 +189,31 @@ public partial class Home
                               SQL Server container
 
                     Deployment flow:
-                    GitHub repository -> Dokploy -> Docker Compose -> VM containers
+                    git push
+                         |
+                         v
+                    GitHub repository
+                         |
+                         v
+                    GitHub Actions / Dokploy trigger
+                         |
+                         v
+                    Dokploy on Ubuntu VM
+                         |
+                         v
+                    Docker Compose builds/recreates containers
+                         |
+                         v
+                    Running application:
+                    - Blazor container
+                    - API container
+                    - SQL Server container
                     """,
                     null,
                     null,
                     null)
             },
 
-            DocumentationCategoryEnum.InfrastructureAndDeployment => new[]
-            {
-                new ImplementationScreenItem(
-                    "Docker Compose status",
-                    "Terminal command used to verify the production containers on the VM.",
-                    null,
-                    "docker compose ps",
-                    null,
-                    null)
-            },
             DocumentationCategoryEnum.CiCdPipeline => new[]
             {
                 new ImplementationScreenItem(
