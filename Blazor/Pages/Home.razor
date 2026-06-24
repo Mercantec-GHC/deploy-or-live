@@ -1,21 +1,27 @@
 @page "/"
 @using DomainModels.Dto
 @using DomainModels.Models
-@using Blazor.Interfaces
-@inject IHealthApiClient HealthApiClient
-@inject IDocumentationApiClient DocumentationApiClient
+@using Blazor.Components
 
-<PageTitle>Victoria's Documentation</PageTitle>
+<PageTitle>DoDLJ</PageTitle>
 
 <div class="documentation-page">
+    @* Hero / intro section *@
     <section class="journey-hero">
         <div class="journey-hero-content">
             <p class="journey-eyebrow">Deployment learning portfolio</p>
-            <h1 class="journey-title">Victoria's Deployment Journey</h1>
-            <p class="journey-subtitle">
-                Documentation report of a 3-week deployment and DevOps course "Deploy or Die", including implementation notes,
+            <h1 class="journey-title">DoDLJ. Victoria's Deployment Journey</h1>
+            <div class="journey-subtitle">
+                <p>Documentation report of a 3-week deployment and DevOps course "Deploy or Die", including implementation notes,
                 infrastructure decisions, troubleshooting, and learning reflections.
-            </p>
+                </p>
+                <p>Student: <span class="nested-text">Victoria Wivelsted</span></p>
+                <p>School: <span class="nested-text">Mercantec</span></p>
+                <p>Course: <span class="nested-text">Deploy or Die</span></p>
+                <p>Teachers: <span class="nested-text">Mathias Gaarsdal Steenberg, Paw Dahl Andersen, Jakob Kjartansson</span></p>
+                <p>Repository link: <span class="nested-text"><a href="https://github.com/Mercantec-GHC/deploy-or-live" target="_blank">GitHub</a></span></p>
+                <p>Live URL: <span class="nested-text"><a href="https://victoria.mercantec.tech" target="_blank">https://victoria.mercantec.tech</a></span></p>
+            </div>
             <div class="journey-badges">
                 <span class="journey-badge">Blazor WebAssembly (.NET8)</span>
                 <span class="journey-badge">ASP.NET Core Web API (.NET8)</span>
@@ -27,11 +33,13 @@
                 <span class="journey-badge">VM (Ubuntu Server)</span>
                 <span class="journey-badge">SSH</span>
                 <span class="journey-badge">GitHub</span>
+                <span class="journey-badge">GitHub Actions</span>
                 <span class="journey-badge">Dokploy</span>
             </div>
         </div>
     </section>
 
+    @* API/database health status and edit mode controls *@
     <section class="journey-status-strip">
         <div class="journey-status-content">
             @if (healthStatus is null)
@@ -68,11 +76,13 @@
         </div>
     </section>
 
+    @* Error message shown when API calls fail *@
     @if (!string.IsNullOrWhiteSpace(errorMessage))
     {
         <div class="journey-alert" role="alert">@errorMessage</div>
     }
 
+    @* Small report summary cards *@
     <section class="journey-snapshot-grid">
         <article class="snapshot-card">
             <p class="snapshot-label">Milestones</p>
@@ -91,6 +101,7 @@
         </article>
     </section>
 
+    @* Course skills checklist *@
     <section class="skills-section">
         <div class="skills-header">
             <h2 class="skills-title">Skills Gained</h2>
@@ -107,7 +118,9 @@
         </ul>
     </section>
 
+    @* Main documentation report layout *@
     <section class="documentation-report-layout">
+        @* Table of contents generated from milestones *@
         <aside class="toc-panel">
             <h2>Table of Contents</h2>
             @if (milestones.Count == 0)
@@ -130,6 +143,7 @@
             }
         </aside>
 
+        @* Documentation milestone cards *@
         <div class="report-sections">
             @for (var i = 0; i < milestones.Count; i++)
             {
@@ -154,6 +168,7 @@
                         }
                     </header>
 
+                    @* Edit form for the selected milestone *@
                     @if (isEditMode && editingMilestone?.Category == milestone.Category)
                     {
                         <div class="milestone-edit-form">
@@ -173,6 +188,7 @@
                     }
                     else
                     {
+                        @* Read-only milestone content and implementation screens *@
                         <div class="report-section-body">
                             @if (string.IsNullOrWhiteSpace(milestone.DocumentationContent))
                             {
@@ -181,8 +197,12 @@
                             else
                             {
                                 <p class="milestone-documentation">@milestone.DocumentationContent</p>
-                                <p class="milestone-character-count">Character count: @CountCharacters(milestone)</p>
                             }
+
+                            <ImplementationScreen Items="GetImplementationScreensFor(milestone.Category)"
+                                                  CategoryDisplayName="@milestone.CategoryDisplayName" />
+
+                            <p class="milestone-character-count">Character count: @CountCharacters(milestone)</p>
                         </div>
                     }
                 </article>
@@ -190,118 +210,3 @@
         </div>
     </section>
 </div>
-
-
-
-@code {
-    private List<DocumentationMilestoneDto> milestones = new();
-    private string? errorMessage;
-    private HealthStatusDto? healthStatus;
-    private DocumentationMilestoneDto? editingMilestone;
-    private UpdateDocumentationMilestoneDto editModel = new();
-    private bool isEditMode = false;
-    private string editApiKey = string.Empty;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadHealthStatusAsync();
-        await LoadMilestonesAsync();
-    }
-
-    private async Task LoadHealthStatusAsync()
-    {
-        try
-        {
-            healthStatus = await HealthApiClient.GetHealthAsync();
-        }
-        catch
-        {
-            healthStatus = new HealthStatusDto
-            {
-                Status = "Unreachable",
-                Database = "Unknown",
-                Environment = "Unknown",
-                Timestamp = DateTime.UtcNow
-            };
-        }
-    }   
-
-    private async Task LoadMilestonesAsync()
-    {
-        try
-        {
-            milestones = await DocumentationApiClient.GetMilestonesAsync();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Could not load documentation milestones. Is the API running? Error: {ex.Message}";
-        }
-    }
-
-    private int CountCharacters(DocumentationMilestoneDto milestone)
-    {
-        if (milestone is null || string.IsNullOrWhiteSpace(milestone.DocumentationContent))
-        {
-			return 0;
-        }
-        var characterCount = milestone.DocumentationContent.Length;
-		return characterCount;
-    }
-
-    private int TotalCharacterCount()
-    {
-        return milestones.Sum(m => CountCharacters(m));
-	}
-
-    private void StartEditingMilestone(DocumentationMilestoneDto milestone)
-    {
-        editingMilestone = milestone;
-
-        editModel = new UpdateDocumentationMilestoneDto
-        {
-            CategoryDisplayName = milestone.CategoryDisplayName,
-            DocumentationContent = milestone.DocumentationContent
-        };
-    }
-
-    private void CancelEditingMilestone()
-    {
-        editingMilestone = null;
-        editModel = new UpdateDocumentationMilestoneDto();
-    }
-
-    private async Task SaveMilestoneAsync()
-    {
-        if (editingMilestone is null)
-        {
-            return;
-        }
-
-        var updatedMilestone = await DocumentationApiClient.UpdateMilestoneAsync(
-            editingMilestone.Category,
-            editModel,
-            editApiKey);
-
-        if (updatedMilestone is null)
-        {
-            errorMessage = "Could not update documentation milestone. Check your edit key.";
-            return;
-        }
-
-        var index = milestones.FindIndex(milestone => milestone.Category == updatedMilestone.Category);
-
-        if (index >= 0)
-        {
-            milestones[index] = updatedMilestone;
-        }
-
-        editingMilestone = null;
-        editModel = new UpdateDocumentationMilestoneDto();
-    }
-
-    private static string GetThemeClass(int index)
-    {
-        var themes = new[] { "theme-blue", "theme-violet", "theme-teal" };
-        return themes[index % themes.Length];
-    }
-}
