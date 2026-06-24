@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 
 namespace Blazor.Components;
 
@@ -18,6 +19,7 @@ public partial class ImplementationScreen
 public sealed record ImplementationScreenItem(
     string Title,
     string? Description,
+    string? Snippet,
     string? Command,
     string? ImageUrl,
     string? ImageAlt);

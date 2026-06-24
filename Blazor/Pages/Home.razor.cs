@@ -130,11 +130,52 @@ public partial class Home
     {
         return category switch
         {
+            DocumentationCategoryEnum.ProjectDescription => new[]
+            {
+                new ImplementationScreenItem(
+                    "System architecture",
+                    null,
+					"""
+                    Browser / User
+                         |
+                         v
+                    Cloudflare
+                    - DNS for victoria.mercantec.tech
+                    - Public HTTPS endpoint
+                    - Cloudflare Tunnel entry point
+                         |
+                         v
+                    cloudflared tunnel connector on Ubuntu VM
+                    - creates an outbound tunnel from my VM to Cloudflare
+                    - avoids exposing the VM directly with normal public inbound traffic
+                         |
+                         v
+                    VM: Ubuntu Server
+                         |
+                         v
+                    Nginx reverse proxy
+                         |
+                         +--> Blazor WebAssembly container
+                         |
+                         +--> ASP.NET Core Web API container
+                                      |
+                                      v
+                              SQL Server container
+
+                    Deployment flow:
+                    GitHub repository -> Dokploy -> Docker Compose -> VM containers
+                    """,
+                    null,
+                    null,
+                    null)
+            },
+
             DocumentationCategoryEnum.InfrastructureAndDeployment => new[]
             {
                 new ImplementationScreenItem(
                     "Docker Compose status",
                     "Terminal command used to verify the production containers on the VM.",
+                    null,
                     "docker compose ps",
                     null,
                     null)
@@ -144,6 +185,7 @@ public partial class Home
                 new ImplementationScreenItem(
                     "Dokploy deployment logs",
                     "Add a screenshot by placing it in Blazor/wwwroot/images/implementation-screens/ and setting ImageUrl to its relative path.",
+                    null,
                     null,
                     null,
                     null)
