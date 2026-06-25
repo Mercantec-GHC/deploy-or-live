@@ -1,4 +1,4 @@
-using Blazor.Components;
+﻿using Blazor.Components;
 using Blazor.Interfaces;
 using DomainModels.Dto;
 using DomainModels.Models;
@@ -152,7 +152,8 @@ public partial class Home
                     "\r\nMonitoring: Docker logs, health checks, Dokploy monitoring" +
                     "\r\nSecurity: SSH, firewall, environment variables, edit key, security headers",					
                     null,
-                    null,
+					null,
+					null,
 					null,
 					null)
 			},
@@ -210,7 +211,8 @@ public partial class Home
                     - API container
                     - SQL Server container
                     """,
-                    null,
+					null,
+					null,
 					"VM setup screenshot",
 					"images/implementation-screens/Screenshot-VM-setup.png",
 	                "VM setup screenshot"
@@ -220,13 +222,40 @@ public partial class Home
             DocumentationCategoryEnum.CiCdPipeline => new[]
             {
                 new ImplementationScreenItem(
-                    "Dokploy deployment logs",
-                    "Add a screenshot by placing it in Blazor/wwwroot/images/implementation-screens/ and setting ImageUrl to its relative path.",
+                    "CI/CD flow diagram",
                     null,
-                    null,
-                    null,
-					null,
-					null)
+                    """
+                    Developer pushes to main
+                         |
+                         v
+                    GitHub repository
+                         |
+                         v
+                    GitHub Actions workflow starts
+                         |
+                         v
+                    Self-hosted runner on VM executes job
+                         |
+                         v
+                    Runner calls Dokploy on localhost:3000
+                         |
+                         v
+                    Dokploy redeploys Docker Compose stack
+                         |
+                         v
+                    Live website updates
+
+                    Result:
+                    - Docker Compose stack is rebuilt/recreated
+                    - Blazor WebAssembly container is updated
+                    - API container is updated
+                    - Live site runs the newest version from main
+                    """,
+					"deploy.yml",
+					"name: Deploy with Dokploy\r\n\r\non:\r\n  push:\r\n    branches:\r\n      - main\r\n\r\njobs:\r\n  deploy:\r\n    runs-on: self-hosted\r\n\r\n    steps:\r\n      - name: Trigger Dokploy deployment locally\r\n        shell: bash\r\n        run: |\r\n          set -e\r\n\r\n          echo \"Triggering Dokploy deployment...\"\r\n\r\n          RESPONSE=$(curl -sS -X POST \"${{ secrets.DOKPLOY_WEBHOOK_URL }}\" \\\r\n            -H \"Content-Type: application/json\" \\\r\n            -H \"X-GitHub-Event: push\" \\\r\n            -d '{\"ref\":\"refs/heads/main\",\"repository\":{\"full_name\":\"Mercantec-GHC/deploy-or-live\"}}')\r\n\r\n          echo \"Dokploy response:\"\r\n          echo \"$RESPONSE\"\r\n\r\n          echo \"$RESPONSE\" | grep -q \"Compose deployed successfully\"",
+                    "A Dokploy deployments status screenshot",
+					"images/implementation-screens/Screenshot-Dokploy-deployments.png",
+					"A Dokploy deployment screenshot")
             },
             _ => Array.Empty<ImplementationScreenItem>()
         };

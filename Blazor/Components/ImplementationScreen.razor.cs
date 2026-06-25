@@ -20,7 +20,8 @@ public sealed record ImplementationScreenItem(
     string Title,
     string? Description,
     string? Snippet,
-    string? Command,
+    string? CommandDescription,
+	string? Command,
     string? ImageDescription,
 	string? ImageUrl,
     string? ImageAlt);
