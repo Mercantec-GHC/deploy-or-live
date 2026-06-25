@@ -284,12 +284,12 @@ public partial class Home
             {
                 new ImplementationScreenItem(
                     "Dokploy monitoring",
-                    "Screenshot from the Dokploy monitoring view used to check the deployed application status.",
+                    null,
                     null,
                     null,
 					null,
-					"Dokploy monitoring screenshot",
-                    "images/implementation-screens/Screenshot-Dokploy-Monitoring.png",
+					null,
+					"images/implementation-screens/Screenshot-Dokploy-monitoring.png",
                     "Dokploy monitoring dashboard screenshot")
                 },
 			_ => Array.Empty<ImplementationScreenItem>()
