@@ -211,8 +211,8 @@ public partial class Home
                     - API container
                     - SQL Server container
                     """,
-					null,
-					null,
+					"docker-compose.yml",
+					"services:\r\n sqlserver:\r\n    image: mcr.microsoft.com/mssql/server:2022-latest \r\n    environment:\r\n      ACCEPT_EULA: \"Y\"\r\n      MSSQL_SA_PASSWORD: \"${MSSQL_SA_PASSWORD}\"\r\n    ports: \r\n        - \"127.0.0.1:1433:1433\"\r\n    volumes:\r\n        - sqlserver_data:/var/opt/mssql\r\n    healthcheck:\r\n        test: [\"CMD-SHELL\", \"/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \\\"$${MSSQL_SA_PASSWORD}\\\" -C -Q \\\"SELECT 1\\\" || exit 1\"]\r\n        interval: 10s\r\n        timeout: 5s\r\n        retries: 20\r\n        start_period: 30s\r\n    networks:\r\n      - dodlj_network\r\n api:\r\n    build:\r\n      context: .\r\n      dockerfile: API/Dockerfile\r\n    environment:\r\n     ASPNETCORE_ENVIRONMENT: Production\r\n     ConnectionStrings__DefaultConnection: \"Server=sqlserver,1433;Database=${DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;\"\r\n     DocumentationEditApiKey: \"${DOCUMENTATION_EDIT_API_KEY}\"\r\n    depends_on:\r\n      sqlserver:\r\n        condition: service_healthy\r\n    healthcheck:\r\n      test: [\"CMD-SHELL\", \"curl -f http://localhost:8080/api/health || exit 1\"]\r\n      interval: 10s\r\n      timeout: 5s\r\n      retries: 5\r\n      start_period: 30s\r\n    networks:\r\n      - dodlj_network\r\n blazor:\r\n    build:\r\n       context: .\r\n       dockerfile: Blazor/Dockerfile\r\n    depends_on:\r\n      - api\r\n    ports:\r\n     - \"8080:80\"\r\n    networks:\r\n      - dodlj_network\r\n    \r\nvolumes:\r\n  sqlserver_data:\r\n  \r\nnetworks:\r\n  dodlj_network:\r\n",
 					"VM setup screenshot",
 					"images/implementation-screens/Screenshot-VM-setup.png",
 	                "VM setup screenshot"
@@ -278,6 +278,19 @@ public partial class Home
                     "A screenshot of Dev tools with security headers",
                     "images/implementation-screens/Screenshot-Nginx-configuration.png",
                     "A screenshot of the Nginx configuration")
+                },
+
+            DocumentationCategoryEnum.MonitoringAndOperations => new[]
+            {
+                new ImplementationScreenItem(
+                    "Dokploy monitoring",
+                    "Screenshot from the Dokploy monitoring view used to check the deployed application status.",
+                    null,
+                    null,
+					null,
+					"Dokploy monitoring screenshot",
+                    "images/implementation-screens/Screenshot-Dokploy-Monitoring.png",
+                    "Dokploy monitoring dashboard screenshot")
                 },
 			_ => Array.Empty<ImplementationScreenItem>()
         };

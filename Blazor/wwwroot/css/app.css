@@ -517,6 +517,7 @@ code {
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
     overflow: hidden;
     position: relative;
+    min-width: 0;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -656,6 +657,7 @@ code {
 .report-section-body {
     padding: 1.2rem 1.2rem 1.35rem;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), color-mix(in srgb, var(--theme-soft) 35%, #ffffff));
+    min-width: 0;
 }
 
 .milestone-documentation {
@@ -670,6 +672,8 @@ code {
     margin-top: 1.25rem;
     padding-top: 1rem;
     border-top: 1px dashed color-mix(in srgb, var(--theme-primary) 24%, #d8e3f3);
+    max-width: 100%;
+    min-width: 0;
 }
 
 .implementation-screen-section h4 {
@@ -682,6 +686,8 @@ code {
 .implementation-screen-grid {
     display: grid;
     gap: 0.9rem;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .implementation-screen-card {
@@ -689,6 +695,10 @@ code {
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.78);
     padding: 0.95rem;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .implementation-screen-card h5 {
@@ -707,6 +717,11 @@ code {
 .implementation-screen-card pre {
     margin: 0.75rem 0 0;
     overflow-x: auto;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
     border-radius: 10px;
     background: #0f172a;
     color: #e2e8f0;
@@ -721,7 +736,11 @@ code {
 .implementation-screen-card img {
     display: block;
     width: 100%;
+    max-width: 100%;
     height: auto;
+    object-fit: contain;
+    object-position: top left;
+    box-sizing: border-box;
     margin-top: 0.75rem;
     border: 1px solid #d8e3f3;
     border-radius: 12px;
