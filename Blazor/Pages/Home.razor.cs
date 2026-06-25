@@ -257,7 +257,29 @@ public partial class Home
 					"images/implementation-screens/Screenshot-Dokploy-deployments.png",
 					"A Dokploy deployment screenshot")
             },
-            _ => Array.Empty<ImplementationScreenItem>()
+            DocumentationCategoryEnum.Security => new[]
+            {
+                new ImplementationScreenItem(
+                    "Security measures",
+					null,
+                    """
+                    1. SSH access to the server is restricted to specific users and keys.
+                    2. Firewall rules are configured to allow only necessary traffic (e.g., HTTP, HTTPS, SSH).
+                    3. Environment variables are used for sensitive information (e.g., database connection strings, API keys).
+                    4. An edit key is required to update documentation milestones via the API.
+                    5. Security headers are configured in Nginx to enhance security:
+                       - X-Frame-Options: DENY
+                       - X-Content-Type-Options: nosniff
+                       - Referrer-Policy: strict-origin-when-cross-origin
+                       - Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://victoria.mercantec.tech;
+                    """,
+					"nginx.conf",
+					"server {\r\n    listen 80;\r\n\r\n    root /usr/share/nginx/html;\r\n    index index.html;\r\n\r\n    location /api {\r\n        proxy_pass http://api:8080;\r\n        proxy_http_version 1.1;\r\n        proxy_set_header Host $host;\r\n        proxy_set_header X-Real-IP $remote_addr;\r\n    }\r\n\r\n    location / {\r\n        try_files $uri $uri/ /index.html;\r\n\r\n        add_header X-Frame-Options \"DENY\" always;\r\n        add_header X-Content-Type-Options \"nosniff\" always;\r\n        add_header Referrer-Policy \"strict-origin-when-cross-origin\" always;\r\n        add_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://victoria.mercantec.tech;\" always;\r\n    }\r\n}",
+                    "A screenshot of Dev tools with security headers",
+                    "images/implementation-screens/Screenshot-Nginx-configuration.png",
+                    "A screenshot of the Nginx configuration")
+                },
+			_ => Array.Empty<ImplementationScreenItem>()
         };
     }
 }
