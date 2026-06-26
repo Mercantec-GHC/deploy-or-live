@@ -274,7 +274,21 @@ public partial class Home
                        - Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://victoria.mercantec.tech;
                     """,
 					"nginx.conf",
-					"server {\r\n    listen 80;\r\n\r\n    root /usr/share/nginx/html;\r\n    index index.html;\r\n\r\n    location /api {\r\n        proxy_pass http://api:8080;\r\n        proxy_http_version 1.1;\r\n        proxy_set_header Host $host;\r\n        proxy_set_header X-Real-IP $remote_addr;\r\n    }\r\n\r\n    location / {\r\n        try_files $uri $uri/ /index.html;\r\n\r\n        add_header X-Frame-Options \"DENY\" always;\r\n        add_header X-Content-Type-Options \"nosniff\" always;\r\n        add_header Referrer-Policy \"strict-origin-when-cross-origin\" always;\r\n        add_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://victoria.mercantec.tech;\" always;\r\n    }\r\n}",
+					"server {\r\n    " +
+                    "listen 80;\r\n\r\n    " +
+                    "root /usr/share/nginx/html;\r\n    " +
+                    "index index.html;\r\n\r\n    " +
+                    "location /api {\r\n        " +
+                    "proxy_pass http://api:8080;\r\n      " +
+                    "  proxy_http_version 1.1;\r\n       " +
+                    " proxy_set_header Host $host;\r\n      " +
+                    "  proxy_set_header X-Real-IP $remote_addr;\r\n    }\r\n\r\n   " +
+                    " location / {\r\n        try_files $uri $uri/ /index.html;\r\n\r\n       " +
+                    " add_header X-Frame-Options \"DENY\" always;\r\n       " +
+                    " add_header X-Content-Type-Options \"nosniff\" always;\r\n    " +
+                    " add_header Referrer-Policy \"strict-origin-when-cross-origin\" always;\r\n   " +
+					"add_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://victoria.mercantec.tech;\" always;\r\n    }" +
+                    "\r\n    }\r\n}",
                     "A screenshot of Dev tools with security headers",
                     "images/implementation-screens/Screenshot-Nginx-configuration.png",
                     "A screenshot of the Nginx configuration")
